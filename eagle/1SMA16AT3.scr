@@ -1,0 +1,149 @@
+# Library script
+# 
+# Exported from /home/brad/eagle/aesop/1SMA16AT3.lbr at  3/05/2003 09:08:18 
+# 
+# EAGLE Version 4.09r2 Copyright (c) 1988-2002 CadSoft
+# 
+Set Wire_Bend 2;
+# Grid changed to 'mm' to avoid loss of precision!
+Grid mm;
+Layer   1 Top;
+Layer  16 Bottom;
+Layer  17 Pads;
+Layer  18 Vias;
+Layer  19 Unrouted;
+Layer  20 Dimension;
+Layer  21 tPlace;
+Layer  22 bPlace;
+Layer  23 tOrigins;
+Layer  24 bOrigins;
+Layer  25 tNames;
+Layer  26 bNames;
+Layer  27 tValues;
+Layer  28 bValues;
+Layer  29 tStop;
+Layer  30 bStop;
+Layer  31 tCream;
+Layer  32 bCream;
+Layer  33 tFinish;
+Layer  34 bFinish;
+Layer  35 tGlue;
+Layer  36 bGlue;
+Layer  37 tTest;
+Layer  38 bTest;
+Layer  39 tKeepout;
+Layer  40 bKeepout;
+Layer  41 tRestrict;
+Layer  42 bRestrict;
+Layer  43 vRestrict;
+Layer  44 Drills;
+Layer  45 Holes;
+Layer  46 Milling;
+Layer  47 Measures;
+Layer  48 Document;
+Layer  49 Reference;
+Layer  51 tDocu;
+Layer  52 bDocu;
+Layer  91 Nets;
+Layer  92 Busses;
+Layer  93 Pins;
+Layer  94 Symbols;
+Layer  95 Names;
+Layer  96 Values;
+Description '\
+<b>On Semiconductor 1SMA16AT3 zener transient voltage supressor</b><p>\n\
+ <author>Created by brad@heeltoe.com</author>';
+
+Edit SCHOTTKY.sym;
+Layer 95;
+Change Size 1.778;
+Change Ratio 8;
+Change Font Proportional;
+Text '>NAME' R0 (2.54 0.635);
+Pin 'A' Pas None Short R0 Off 0 (-2.54 0);
+Pin 'K' Pas None Short R180 Off 0 (2.54 0);
+Layer 96;
+Change Size 1.778;
+Change Ratio 8;
+Text '>VALUE' R0 (2.54 -1.905);
+Layer 94;
+Change Style Continuous;
+Wire  0.254 (-1.27 -1.27) (1.016 0) (-1.27 1.27);
+Wire  0.254 (1.651 1.27) (1.016 1.27) (1.016 0);
+Wire  0.254 (-1.27 1.27) (-1.27 -1.27);
+Wire  0.254 (1.016 0) (1.016 -1.27);
+Wire  0.254 (1.651 1.27) (1.651 1.016);
+Wire  0.254 (1.016 -1.27) (0.381 -1.27);
+Wire  0.254 (0.381 -1.016) (0.381 -1.27);
+
+Edit SMA.pac;
+Description '<b>SMALL OUTLINE DIODE</b>';
+Layer 25;
+Change Size 1.27;
+Change Ratio 8;
+Text '>NAME' R0 (-2.159 1.27);
+Layer 27;
+Change Size 1.27;
+Change Ratio 8;
+Text '>VALUE' R0 (-2.159 -2.921);
+Layer 21;
+Wire  0.1016 (-2.2606 1.016) (2.2606 1.016);
+Wire  0.1016 (-2.2606 -1.016) (2.2606 -1.016);
+Layer 51;
+Wire  0.1016 (-2.261 -1.016) (-2.261 1.016);
+Wire  0.1016 (2.261 -1.016) (2.261 1.016);
+Layer 1;
+Smd '1' 2.0 2.0 -0 (-2.2 0);
+Layer 1;
+Smd '2' 2.0 2.0 -0 (2.2 0);
+Layer 21;
+Wire  0.2032 (0.643 0.619) (-0.73 0) (0.643 -0.619) (0.643 0.619);
+Wire  0.2032 (-0.73 0.619) (-0.73 0) (-0.73 -0.619);
+Layer 21;
+Arc CW 0.127 (-2.286 1.016) (-2.032 -1.016) (-2.286 -1.016);
+Layer 39;
+Wire  0.0508 (-2.794 1.143) (-2.794 -1.143);
+Wire  0.0508 (-2.794 1.143) (2.794 1.143) (2.794 -1.143) (-2.794 -1.143);
+
+Edit SMB.pac;
+Description '<B>DIODE</B>';
+Layer 25;
+Change Size 1.27;
+Change Ratio 8;
+Text '>NAME' R0 (-2.159 2.159);
+Layer 27;
+Change Size 1.27;
+Change Ratio 8;
+Text '>VALUE' R0 (-2.159 -3.429);
+Layer 21;
+Wire  0.1016 (-2.2606 1.905) (2.2606 1.905);
+Wire  0.1016 (-2.2606 -1.905) (2.2606 -1.905);
+Layer 51;
+Wire  0.1016 (-2.2606 -1.905) (-2.2606 1.905);
+Wire  0.1016 (2.2606 -1.905) (2.2606 1.905);
+Layer 1;
+Smd 'C' 2.4 2.4 -0 (-2.2 0);
+Layer 1;
+Smd 'A' 2.4 2.4 -0 (2.2 0);
+Layer 51;
+Rect (-2.794 -1.0922) (-2.2606 1.0922);
+Layer 51;
+Rect (2.2606 -1.0922) (2.794 1.0922);
+Layer 21;
+Wire  0.2032 (0.193 1) (-0.83 0) (0.193 -1) (0.193 1);
+Layer 51;
+Rect (-1.35 -1.9) (-0.8 1.9);
+
+Edit 1SMA16AT3.dev;
+Prefix 'D';
+Description '<b>ZENER DIODE</b>';
+Value Off;
+Add SCHOTTKY 'G$1' Next 0 (0 0);
+Package 'SMA' 'SMA';
+Technology  '';
+Connect  'G$1.K' '1'  'G$1.A' '2';
+Package 'SMB' 'SMB';
+Technology  '';
+Connect  'G$1.C' '1'  'G$1.A' '2';
+
+Grid inch;

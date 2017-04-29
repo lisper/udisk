@@ -1,0 +1,35 @@
+README
+
+udisk v0.3 11/2013 brad@heeltoe.com
+
+This version finally works.  I watched all the bus transactions using an simple
+logic analyser and they look correct.  I booted RT11, XXDP, RSTS V7.2 and BSD 2.9
+from a simulated RL02 disk.
+
+The sources here should allow anyone to rebuild the cpld and the firmware and then
+flash them to the board.  The sam7utils program will write the ARM flash via USB.
+You will need some sort of Xilinx jtag pod to update the cpld (I wish I had connected
+the programming lines to the arm, bit I did not, sorry)
+
+There are multiple revisions in this directory, some experiments.  Only code3 and cpld3
+are currently valid.
+
+released dirs:
+
+cpld   WORKING STATE MACHINE CPLD **
+code   WORKING FIRMWARE **
+
+development dirs:
+
+cpld	original async cpld
+cpld2   first state machine cpld
+cpld3   WORKING STATE MACHINE CPLD **
+cpld4   failed attempt at SPI interface
+cpld5   failed attempt at SPI interface
+cpld6   failed attempt at SPI interface
+
+code    old original code
+code2   old code
+code3   WORKING FIRMWARE **
+code6   spi interface experiment
+

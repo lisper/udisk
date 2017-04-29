@@ -1,0 +1,598 @@
+
+Allocating common symbols
+Common symbol       size              file
+
+cpld_asserting      0x2               main.o
+cmd_pending         0x1               rl.o
+npg_timeout         0x4               main.o
+log                 0x300             main.o
+ide_present         0x4               ide.o
+disk_sectors_per_track
+                    0x4               ide.o
+rmws                0x4               main.o
+cs                  0x2               rl.o
+part_map            0x30              disk.o
+seek_ms             0x2               rl.o
+verbose             0x4               ide.o
+disk_ok             0x4               disk.o
+mp_gs               0x2               rl.o
+cli_state           0x4               cli.o
+debug               0x4               rl.o
+ide_buffer          0x200             ide.o
+usart_ints          0x4               usart.o
+seek_pending        0x1               rl.o
+dma_reads           0x4               main.o
+ide_buffer2         0x200             ide.o
+idle_time           0x4               rl.o
+disk_heads          0x4               ide.o
+reads_cs            0x4               main.o
+buffer2             0x200             tests.o
+rx_ring_cnt         0x1               cli.o
+init_pending        0x1               rl.o
+ds10                0x1               rl.o
+da                  0x2               rl.o
+rx_ring             0x10              cli.o
+ide_state           0x4               ide.o
+cli_line_len        0x4               cli.o
+dma_writes          0x4               main.o
+ba                  0x2               rl.o
+cli_result          0x4               cli.o
+cli_disabled        0x4               cli.o
+npg_again           0x4               main.o
+gen_ints            0x4               main.o
+rx_ring_head        0x1               cli.o
+drive               0x40              rl.o
+bad_match           0x4               main.o
+int_pending         0x1               rl.o
+rx_ring_tail        0x1               cli.o
+buffer1             0x200             tests.o
+seek_time           0x2               rl.o
+writes_cs           0x4               main.o
+missed_ints         0x4               main.o
+disk_cyls           0x4               ide.o
+mp                  0x6               rl.o
+vector              0x2               main.o
+cli_line            0x20              cli.o
+log_p               0x4               main.o
+cpld_ints           0x4               main.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x00000000                . = 0x0
+
+.text           0x00110000     0xae9c
+ *(.text)
+ .text          0x00110000      0x15c start.o
+                0x001100c4                AT91F_Default_FIQ_handler
+                0x00110108                copy_vectors
+                0x001100c8                AT91F_Default_IRQ_handler
+                0x00110000                _start
+                0x001100cc                AT91F_Spurious_handler
+                0x001100d4                disable_ints
+ .text          0x0011015c      0x2fc startup.o
+                0x0011015c                loc0_is_ram
+                0x001102d4                startup
+                0x0011019c                force_mapping_to_ram
+                0x0011044c                ints_are_enabled
+                0x00110438                disable_interrupts
+                0x00110224                startup_irq_vectors
+                0x001101e8                force_mapping_to_rom
+                0x0011043c                enable_interrupts
+ .text          0x00110458      0x130 debug.o
+                0x00110458                markup_ram
+                0x00110528                __spurious_handler
+                0x00110584                debug_setup
+                0x00110478                __data_abort
+                0x0011050c                __software_interrupt
+                0x001104f0                __undefined_instruction
+                0x001104d4                __prefetch_abort
+ .text          0x00110588      0x7c4 main.o
+                0x001107b0                log_reset
+                0x001108f0                run_updater
+                0x00110588                reset_stats
+                0x001108c4                reboot
+                0x00110868                setup_cpld_intr
+                0x00110ad8                main
+                0x0011091c                resetup
+                0x00110730                log_show
+                0x00110614                show_stats
+                0x001107e0                setup_cpld_addr
+ .text          0x00110d4c      0xbd4 unibus.o
+                0x00110d4c                unibus_dma_buffer
+                0x0011147c                unibus_interrupt
+ .text          0x00111920     0x1f58 rl.o
+                0x0011378c                controller_print_state
+                0x00112808                rl11_poll
+                0x001135c8                controller_restart
+                0x001132f0                controller_setup
+                0x001122a8                rl11_reset
+                0x00111920                cpld_isr
+                0x00112624                rl11_setup
+                0x00113788                controller_poll
+                0x00112464                rl11_restart
+                0x00112204                rl11_drive_offine
+                0x001134ec                controller_online
+                0x00112120                rl11_drive_online
+ .text          0x00113878     0x1020 cli.o
+                0x001139f8                parse_word
+                0x00113a64                cli_parse
+                0x00114788                dumpmem
+                0x001138a8                puts
+                0x00114624                cli_poll
+                0x00113910                parse_num
+                0x001145d4                cli_setup
+                0x00114770                tohex
+                0x00113878                putc
+                0x001138f4                help
+                0x001145c0                rx_ring_space
+                0x0011442c                beep
+                0x00114580                rx_ring_add
+                0x00113900                toupper
+                0x00114434                cli_poll_rx_ring
+ .text          0x00114898       0xd8 irq.o
+                0x001148d0                irq_enable
+                0x0011496c                irq_setup
+                0x00114918                irq_ack
+                0x00114944                irq_active
+                0x00114898                irq_configure
+                0x001148e8                irq_disable
+                0x0011492c                irq_trigger
+                0x00114954                irq_pending
+                0x00114900                irq_clear
+ .text          0x00114970      0x3a0 usart.o
+                0x00114988                AT91F_PDC_SetRx
+                0x001149a0                AT91F_PDC_Open
+                0x00114a2c                AT91F_US_Configure
+                0x00114970                AT91F_PDC_SetNextRx
+                0x00114bd0                usart_enable_int
+                0x00114994                AT91F_PDC_SetTx
+                0x00114bd4                usart_disable_int
+                0x00114b34                usart_putc
+                0x00114b78                usart_getc_rdy
+                0x0011497c                AT91F_PDC_SetNextTx
+                0x00114ae0                usart_tx_empty
+                0x00114c48                usart_setup
+                0x001149e8                AT91F_US_Baudrate
+                0x00114b0c                usart_tx_flush
+                0x00114bd8                usart_c_irq_handler
+                0x00114b9c                usart_getc
+ .text          0x00114d10      0x4d8 printf.o
+                0x00114f2c                memcpy
+                0x00115110                __udivsi3
+                0x00114d10                xprintf
+                0x00115184                __umodsi3
+                0x00115080                udivmodsi4
+                0x00114ffc                strncmp
+                0x00114f70                strncpy
+                0x00114f4c                memset
+                0x00114fa4                strcmp
+                0x00115058                strlen
+ .text          0x001151e8       0xc0 bus.o
+                0x001151e8                cpld_reset
+                0x00115210                bus_setup
+ .text          0x001152a8       0x7c pio.o
+                0x001152e8                pio_pins_out
+                0x001152a8                pio_pins_pio_mode
+                0x00115308                pio_pins_peripheral_mode
+                0x001152b8                pio_pins_in
+                0x001152d8                pio_pins_pullup
+ .text          0x00115324      0x3b8 disk.o
+                0x00115368                write_disk_block256
+                0x0011544c                disk_part_valid
+                0x00115468                disk_read_part
+                0x00115324                read_disk_block256
+                0x00115420                read_buffer
+                0x001153d4                read_disk_block512
+                0x00115698                disk_setup
+                0x00115424                le32_p
+                0x00115400                write_disk_block512
+ .text          0x001156dc     0x24f0 ide.o
+                0x00116498                hd_read_mapped
+                0x00117578                ide_read_reg_cont
+                0x00117a08                ide_setup
+                0x00116280                led_set
+                0x00116d58                ide_identify_drive
+                0x00117350                ide_wiggle_reset
+                0x001171a8                ide_show_regs
+                0x00117480                ide_en
+                0x001156dc                delayus
+                0x00115994                hd_busy_wait
+                0x001168c8                hd_write_mapped
+                0x001163e4                led_clear
+                0x00116c84                ide_fixstring
+                0x00115708                ide_assert_reset
+                0x0011782c                ide_read_block
+                0x00116328                led_activity
+                0x00117610                ide_read_block_cont
+ .text          0x00117bcc     0x2d00 tests.o
+                0x00119384                delayme
+                0x001193b4                bus_force
+                0x0011a264                bus_match_test
+                0x00118534                test_dma_read
+                0x001183b8                test_dma_rw
+                0x0011a268                test_dma_cont
+                0x001183bc                test_dma_wr
+                0x00117e40                test_led_wiggle
+                0x0011a394                test_cpld_msyn
+                0x0011a858                test_int_cont
+                0x0011a25c                bus_wiggle_data
+                0x00119fac                bus_wiggle_dma
+                0x0011a2b8                test_cpld_read
+                0x001183d4                test_dma_rd
+                0x0011a314                test_cpld_write
+                0x0011a260                bus_match
+                0x001187c8                bus_show
+                0x00117c68                test_cpld_io
+                0x001198dc                bus_reset
+                0x001183ec                test_dma_simple
+                0x00119bdc                bus_wiggle_npg
+                0x00118b20                show_bus_signals
+                0x0011a438                test_cause_int
+                0x00118bf8                bus_listen
+                0x00119d6c                bus_wiggle_br5
+                0x001185c4                test_dma_fill
+                0x001181b8                test_dma
+                0x00119b58                bus_wiggle
+                0x0011807c                test_led_set
+                0x00117bcc                show_cpld_regs
+ .text          0x0011a8cc      0x5c8 boots.o
+                0x0011a96c                load_boot3
+                0x0011a9c8                load_int
+                0x0011a8cc                load_boot1
+                0x0011aba4                load_poll
+                0x0011aa88                load_int_rti
+                0x0011ae50                load_regs
+                0x0011a910                load_boot2
+ .text          0x0011ae94        0x8 rom.o
+                0x0011ae94                in_ram
+
+.glue_7         0x0011ae9c        0x0
+
+.glue_7t        0x0011ae9c        0x0
+                0x0011ae9c                . = ALIGN (0x4)
+
+.rodata         0x0011ae9c      0xac4
+ *(.rodata)
+ .rodata        0x0011ae9c       0x14 printf.o
+ *(.rodata.*)
+ .rodata.str1.4
+                0x0011aeb0       0xaa debug.o
+                                 0xac (size before relaxing)
+ *fill*         0x0011af5a        0x2 00
+ .rodata.str1.4
+                0x0011af5c       0xe1 main.o
+                                 0xe4 (size before relaxing)
+ *fill*         0x0011b03d        0x3 00
+ .rodata.str1.4
+                0x0011b040      0x198 rl.o
+                                0x19c (size before relaxing)
+ .rodata.str1.4
+                0x0011b1d8       0x57 cli.o
+                                 0x64 (size before relaxing)
+ *fill*         0x0011b22f        0x1 00
+ .rodata.str1.4
+                0x0011b230       0x74 disk.o
+ .rodata.str1.4
+                0x0011b2a4      0x219 ide.o
+                                0x21c (size before relaxing)
+ *fill*         0x0011b4bd        0x3 00
+ .rodata.str1.4
+                0x0011b4c0      0x3f5 tests.o
+                                0x408 (size before relaxing)
+ *fill*         0x0011b8b5        0x3 00
+ .rodata.str1.4
+                0x0011b8b8       0xa8 boots.o
+
+.data           0x0011b960      0x158
+ *(.data)
+ .data          0x0011b960       0x24 printf.o
+ .data          0x0011b984      0x134 boots.o
+                0x0011b984                regs1
+                0x0011ba1c                boot2
+                0x0011b9e4                boot3
+                0x0011bab8                _rom_end = <code 336> (.)
+                0x00200040                . = 0x200040
+
+.bss            0x00200040      0xf3c
+ *(.bss)
+ .bss           0x00200040      0x100 cli.o
+ .bss           0x00200140      0x200 disk.o
+ .bss           0x00200340        0x4 ide.o
+ COMMON         0x00200344      0x338 main.o
+                                  0x0 (size before relaxing)
+                0x00200344                cpld_asserting
+                0x00200348                npg_timeout
+                0x0020034c                log
+                0x0020064c                rmws
+                0x00200650                dma_reads
+                0x00200654                reads_cs
+                0x00200658                dma_writes
+                0x0020065c                npg_again
+                0x00200660                gen_ints
+                0x00200664                bad_match
+                0x00200668                writes_cs
+                0x0020066c                missed_ints
+                0x00200670                vector
+                0x00200674                log_p
+                0x00200678                cpld_ints
+ COMMON         0x0020067c       0x66 rl.o
+                                  0x0 (size before relaxing)
+                0x0020067c                cmd_pending
+                0x0020067e                cs
+                0x00200680                seek_ms
+                0x00200682                mp_gs
+                0x00200684                debug
+                0x00200688                seek_pending
+                0x0020068c                idle_time
+                0x00200690                init_pending
+                0x00200691                ds10
+                0x00200692                da
+                0x00200694                ba
+                0x00200698                drive
+                0x002006d8                int_pending
+                0x002006da                seek_time
+                0x002006dc                mp
+ *fill*         0x002006e2        0x2 00
+ COMMON         0x002006e4       0x46 cli.o
+                                  0x0 (size before relaxing)
+                0x002006e4                cli_state
+                0x002006e8                rx_ring_cnt
+                0x002006e9                rx_ring
+                0x002006fc                cli_line_len
+                0x00200700                cli_result
+                0x00200704                cli_disabled
+                0x00200708                rx_ring_head
+                0x00200709                rx_ring_tail
+                0x0020070a                cli_line
+ *fill*         0x0020072a        0x2 00
+ COMMON         0x0020072c        0x4 usart.o
+                                  0x0 (size before relaxing)
+                0x0020072c                usart_ints
+ COMMON         0x00200730       0x34 disk.o
+                                  0x0 (size before relaxing)
+                0x00200730                part_map
+                0x00200760                disk_ok
+ COMMON         0x00200764      0x418 ide.o
+                                  0x0 (size before relaxing)
+                0x00200764                ide_present
+                0x00200768                disk_sectors_per_track
+                0x0020076c                verbose
+                0x00200770                ide_buffer
+                0x00200970                ide_buffer2
+                0x00200b70                disk_heads
+                0x00200b74                ide_state
+                0x00200b78                disk_cyls
+ COMMON         0x00200b7c      0x400 tests.o
+                                  0x0 (size before relaxing)
+                0x00200b7c                buffer2
+                0x00200d7c                buffer1
+Address of section .text set to 0x110000
+LOAD start.o
+LOAD startup.o
+LOAD debug.o
+LOAD main.o
+LOAD unibus.o
+LOAD rl.o
+LOAD cli.o
+LOAD irq.o
+LOAD usart.o
+LOAD printf.o
+LOAD bus.o
+LOAD pio.o
+LOAD disk.o
+LOAD ide.o
+LOAD tests.o
+LOAD boots.o
+LOAD rom.o
+OUTPUT(firmware.out elf32-littlearm)
+
+.debug_abbrev   0x00000000     0x1dc2
+ .debug_abbrev  0x00000000      0x1f2 startup.o
+ .debug_abbrev  0x000001f2       0xb1 debug.o
+ .debug_abbrev  0x000002a3      0x28a main.o
+ .debug_abbrev  0x0000052d      0x19c unibus.o
+ .debug_abbrev  0x000006c9      0x34f rl.o
+ .debug_abbrev  0x00000a18      0x302 cli.o
+ .debug_abbrev  0x00000d1a       0xf9 irq.o
+ .debug_abbrev  0x00000e13      0x1fb usart.o
+ .debug_abbrev  0x0000100e      0x1a5 printf.o
+ .debug_abbrev  0x000011b3      0x12b bus.o
+ .debug_abbrev  0x000012de       0xc1 pio.o
+ .debug_abbrev  0x0000139f      0x1f5 disk.o
+ .debug_abbrev  0x00001594      0x3bb ide.o
+ .debug_abbrev  0x0000194f      0x2d9 tests.o
+ .debug_abbrev  0x00001c28      0x164 boots.o
+ .debug_abbrev  0x00001d8c       0x36 rom.o
+
+.debug_info     0x00000000     0xd00d
+ .debug_info    0x00000000      0x604 startup.o
+ .debug_info    0x00000604      0x1de debug.o
+ .debug_info    0x000007e2      0xc0f main.o
+ .debug_info    0x000013f1     0x13d8 unibus.o
+ .debug_info    0x000027c9     0x1299 rl.o
+ .debug_info    0x00003a62      0xe83 cli.o
+ .debug_info    0x000048e5      0x3de irq.o
+ .debug_info    0x00004cc3      0xe3b usart.o
+ .debug_info    0x00005afe      0x499 printf.o
+ .debug_info    0x00005f97      0x540 bus.o
+ .debug_info    0x000064d7      0x3c6 pio.o
+ .debug_info    0x0000689d      0x55c disk.o
+ .debug_info    0x00006df9     0x2acc ide.o
+ .debug_info    0x000098c5     0x3398 tests.o
+ .debug_info    0x0000cc5d      0x36c boots.o
+ .debug_info    0x0000cfc9       0x44 rom.o
+
+.debug_line     0x00000000     0x3e3c
+ .debug_line    0x00000000      0x107 startup.o
+ .debug_line    0x00000107       0x63 debug.o
+ .debug_line    0x0000016a      0x2eb main.o
+ .debug_line    0x00000455      0x662 unibus.o
+ .debug_line    0x00000ab7      0x95e rl.o
+ .debug_line    0x00001415      0x3cf cli.o
+ .debug_line    0x000017e4       0x71 irq.o
+ .debug_line    0x00001855      0x176 usart.o
+ .debug_line    0x000019cb      0x146 printf.o
+ .debug_line    0x00001b11       0x8e bus.o
+ .debug_line    0x00001b9f       0x58 pio.o
+ .debug_line    0x00001bf7       0xfb disk.o
+ .debug_line    0x00001cf2      0xc77 ide.o
+ .debug_line    0x00002969     0x1303 tests.o
+ .debug_line    0x00003c6c      0x19d boots.o
+ .debug_line    0x00003e09       0x33 rom.o
+
+.debug_frame    0x00000000     0x1284
+ .debug_frame   0x00000000       0xb4 startup.o
+ .debug_frame   0x000000b4       0x80 debug.o
+ .debug_frame   0x00000134      0x138 main.o
+ .debug_frame   0x0000026c       0x58 unibus.o
+ .debug_frame   0x000002c4      0x1e8 rl.o
+ .debug_frame   0x000004ac      0x198 cli.o
+ .debug_frame   0x00000644       0xa8 irq.o
+ .debug_frame   0x000006ec      0x164 usart.o
+ .debug_frame   0x00000850       0xf4 printf.o
+ .debug_frame   0x00000944       0x5c bus.o
+ .debug_frame   0x000009a0       0x60 pio.o
+ .debug_frame   0x00000a00       0xec disk.o
+ .debug_frame   0x00000aec      0x268 ide.o
+ .debug_frame   0x00000d54      0x404 tests.o
+ .debug_frame   0x00001158      0x10c boots.o
+ .debug_frame   0x00001264       0x20 rom.o
+
+.debug_pubnames
+                0x00000000      0xec8
+ .debug_pubnames
+                0x00000000       0xba startup.o
+ .debug_pubnames
+                0x000000ba       0xa3 debug.o
+ .debug_pubnames
+                0x0000015d      0x16c main.o
+ .debug_pubnames
+                0x000002c9       0x3d unibus.o
+ .debug_pubnames
+                0x00000306      0x1b2 rl.o
+ .debug_pubnames
+                0x000004b8      0x15f cli.o
+ .debug_pubnames
+                0x00000617       0x9a irq.o
+ .debug_pubnames
+                0x000006b1      0x163 usart.o
+ .debug_pubnames
+                0x00000814       0x8d printf.o
+ .debug_pubnames
+                0x000008a1       0x2f bus.o
+ .debug_pubnames
+                0x000008d0       0x7a pio.o
+ .debug_pubnames
+                0x0000094a       0xda disk.o
+ .debug_pubnames
+                0x00000a24      0x1c1 ide.o
+ .debug_pubnames
+                0x00000be5      0x22f tests.o
+ .debug_pubnames
+                0x00000e14       0x97 boots.o
+ .debug_pubnames
+                0x00000eab       0x1d rom.o
+
+.debug_aranges  0x00000000      0x200
+ .debug_aranges
+                0x00000000       0x20 startup.o
+ .debug_aranges
+                0x00000020       0x20 debug.o
+ .debug_aranges
+                0x00000040       0x20 main.o
+ .debug_aranges
+                0x00000060       0x20 unibus.o
+ .debug_aranges
+                0x00000080       0x20 rl.o
+ .debug_aranges
+                0x000000a0       0x20 cli.o
+ .debug_aranges
+                0x000000c0       0x20 irq.o
+ .debug_aranges
+                0x000000e0       0x20 usart.o
+ .debug_aranges
+                0x00000100       0x20 printf.o
+ .debug_aranges
+                0x00000120       0x20 bus.o
+ .debug_aranges
+                0x00000140       0x20 pio.o
+ .debug_aranges
+                0x00000160       0x20 disk.o
+ .debug_aranges
+                0x00000180       0x20 ide.o
+ .debug_aranges
+                0x000001a0       0x20 tests.o
+ .debug_aranges
+                0x000001c0       0x20 boots.o
+ .debug_aranges
+                0x000001e0       0x20 rom.o
+
+.debug_ranges   0x00000000     0x1a08
+ .debug_ranges  0x00000000       0xe8 startup.o
+ .debug_ranges  0x000000e8       0xb0 main.o
+ .debug_ranges  0x00000198      0x1d8 unibus.o
+ .debug_ranges  0x00000370      0x340 rl.o
+ .debug_ranges  0x000006b0      0x3e8 cli.o
+ .debug_ranges  0x00000a98       0x30 usart.o
+ .debug_ranges  0x00000ac8       0x48 printf.o
+ .debug_ranges  0x00000b10       0x18 bus.o
+ .debug_ranges  0x00000b28       0x80 disk.o
+ .debug_ranges  0x00000ba8      0x1c0 ide.o
+ .debug_ranges  0x00000d68      0xca0 tests.o
+
+.debug_str      0x00000000     0x168c
+ .debug_str     0x00000000      0x268 startup.o
+                                0x27a (size before relaxing)
+ .debug_str     0x00000268       0x9e debug.o
+                                0x10b (size before relaxing)
+ .debug_str     0x00000306      0x31a main.o
+                                0x470 (size before relaxing)
+ .debug_str     0x00000620       0x9e unibus.o
+                                0x314 (size before relaxing)
+ .debug_str     0x000006be      0x205 rl.o
+                                0x52e (size before relaxing)
+ .debug_str     0x000008c3      0x313 cli.o
+                                0x5f7 (size before relaxing)
+ .debug_str     0x00000bd6      0x139 irq.o
+                                0x1dd (size before relaxing)
+ .debug_str     0x00000d0f      0x271 usart.o
+                                0x546 (size before relaxing)
+ .debug_str     0x00000f80       0xb5 printf.o
+                                0x12e (size before relaxing)
+ .debug_str     0x00001035        0xe bus.o
+                                0x290 (size before relaxing)
+ .debug_str     0x00001043       0x5c pio.o
+                                0x22d (size before relaxing)
+ .debug_str     0x0000109f      0x143 disk.o
+                                0x230 (size before relaxing)
+ .debug_str     0x000011e2      0x403 ide.o
+                                0x7d7 (size before relaxing)
+ .debug_str     0x000015e5       0x8d tests.o
+                                0x500 (size before relaxing)
+ .debug_str     0x00001672       0x14 boots.o
+                                0x100 (size before relaxing)
+ .debug_str     0x00001686        0x6 rom.o
+                                 0x3a (size before relaxing)
+
+.comment        0x00000000      0x120
+ .comment       0x00000000       0x12 startup.o
+ .comment       0x00000012       0x12 debug.o
+ .comment       0x00000024       0x12 main.o
+ .comment       0x00000036       0x12 unibus.o
+ .comment       0x00000048       0x12 rl.o
+ .comment       0x0000005a       0x12 cli.o
+ .comment       0x0000006c       0x12 irq.o
+ .comment       0x0000007e       0x12 usart.o
+ .comment       0x00000090       0x12 printf.o
+ .comment       0x000000a2       0x12 bus.o
+ .comment       0x000000b4       0x12 pio.o
+ .comment       0x000000c6       0x12 disk.o
+ .comment       0x000000d8       0x12 ide.o
+ .comment       0x000000ea       0x12 tests.o
+ .comment       0x000000fc       0x12 boots.o
+ .comment       0x0000010e       0x12 rom.o

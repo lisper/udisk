@@ -1,0 +1,39 @@
+AT91SAM7 USB firmware flasher - sam7s256 specific version
+
+THIS VERSION ASSUMES THE SAM7S HAS 64K OF SRAM
+
+Original code: Milosch Meriac <meriac@bitmanufaktur.de>
+Current version: Brad Parker <brad@heeltoe.com>
+
+sam7utils: (C) 2006 Erik Gilling
+
+This program communicated with an AT91SAM7 device via USB (or serial)
+and implements the "SAM-BA" protocol.  The protocol allows the program
+to write the flash memory inside the AT91SAM7.
+
+The AT91SAM7 should be recognized as an ACM device. When connected you
+should see linux kernel messages like this:
+
+       cdc_acm 1-1.1:1.0: ttyACM0: USB ACM device
+
+(note: no kernel driver is needed; it's included just for historical purposes)
+
+To install the latest firmware image:
+
+sam7 -l /dev/ttyACM0
+Chip Version: 0
+Embedded Processor: ARM7TDMI
+NVRAM Region 1 Size: 256 K
+NVRAM Region 2 Size: 0 K
+SRAM Size: 256 K
+Series: AT91SAM7Sxx
+Page Size: 256 bytes
+Lock Regions: 16
+sam7> unlock_regions 
+    unlocking region 0: done
+    unlocking region 1: done
+sam7> flash firmware.bin
+sam7> flash controller-ram.bin 256
+sam7> boot_from_flash
+
+

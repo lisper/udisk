@@ -1,0 +1,113 @@
+Partlist exported from /home/brad/eagle/udisk/udisk.sch at  9/29/2011 06:49:25 
+
+Part Value        Device             Package     Description                                                 
+C1   0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C2   0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C3   0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C4   0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C5   0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C6   0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C7   0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C8   0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C9   0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C10  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C11  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C12  10uf         CPOL-USCT3216      CT3216      POLARIZED CAPACITOR, American symbol                        
+C13  4.7uf        CPOL-USCT3216      CT3216      POLARIZED CAPACITOR, American symbol                        
+C14  0.01uf       C-USC0805          C0805       CAPACITOR, American symbol                                  
+C15  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C16  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C17  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C18  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C19  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C20  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C21  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C22  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C23  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C24  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C25  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C26  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C27  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C28  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C29  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C30  1000pf       C-USC0805          C0805       CAPACITOR, American symbol                                  
+C31  2.2uf        C-USC1206          C1206       CAPACITOR, American symbol                                  
+C32  100pf        C-USC0805          C0805       CAPACITOR, American symbol                                  
+C33  0.01uf       C-USC0805          C0805       CAPACITOR, American symbol                                  
+C34  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C35  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C36  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C37  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C38  0.1uf        C-USC0603          C0603       CAPACITOR, American symbol                                  
+C39  33pf         C-USC0805          C0805       CAPACITOR, American symbol                                  
+C40  15pf         C-USC0805          C0805       CAPACITOR, American symbol                                  
+C41  15pf         C-USC0805          C0805       CAPACITOR, American symbol                                  
+D1   TVS 7.5V     1SMA16AT3          SMA         ZENER DIODE                                                 
+IC1               XCR3256XLTQ144     TQ144                                                                   
+IC2  DS3862N      DS3862N            DIL20       Octal High Speed Trapezoidal Bus TransceiverBUS TRANSCEIVER 
+IC3  DS3862N      DS3862N            DIL20       Octal High Speed Trapezoidal Bus TransceiverBUS TRANSCEIVER 
+IC4  DS3862N      DS3862N            DIL20       Octal High Speed Trapezoidal Bus TransceiverBUS TRANSCEIVER 
+IC5  DS3862N      DS3862N            DIL20       Octal High Speed Trapezoidal Bus TransceiverBUS TRANSCEIVER 
+IC6  DS3862N      DS3862N            DIL20       Octal High Speed Trapezoidal Bus TransceiverBUS TRANSCEIVER 
+IC7  DS3862N      DS3862N            DIL20       Octal High Speed Trapezoidal Bus TransceiverBUS TRANSCEIVER 
+IC8  DS3862N      DS3862N            DIL20       Octal High Speed Trapezoidal Bus TransceiverBUS TRANSCEIVER 
+IC9  DS8641N      DS8641N            DIL16       Quad Unified Bus TransceiverBUS TRANSCEIVER                 
+IC10 DS8641N      DS8641N            DIL16       Quad Unified Bus TransceiverBUS TRANSCEIVER                 
+IC11 LP8345       LP8345             TO252       VOLTAGE REGULATOR                                           
+IC12              AT91SAM7S64_LQFP64 LQFP64      Atmel AT91 ARM Thumb-based Microcontroller.  LQFP64 package.
+IC13 MAX3221CPWRG MAX3221CPWRG       TSSOP-16    RS-232 Line driver/receiver                                 
+J1   J5MM         J5MM               05          Bridge                                                      
+J2   J5MM         J5MM               05          Bridge                                                      
+J3   J5MM         J5MM               05          Bridge                                                      
+J4   J5MM         J5MM               05          Bridge                                                      
+J5   J5MM         J5MM               05          Bridge                                                      
+J6   J5MM         J5MM               05          Bridge                                                      
+J7   J5MM         J5MM               05          Bridge                                                      
+J8   J5MM         J5MM               05          Bridge                                                      
+J9   J5MM         J5MM               05          Bridge                                                      
+JP1               PINHD-1X6          1X06        PIN HEADER                                                  
+JP2               PINHD-2X10         2X10        PIN HEADER                                                  
+JP3               PINHD-2X22         2X22        PIN HEADER                                                  
+LED1 GREEN        LEDB156            Q62902-B156 LED                                                         
+LED2 yellow       LEDB156            Q62902-B156 LED                                                         
+LED3              LEDB156            Q62902-B156 LED                                                         
+Q1   18.432Mhz    CTS406             SM406       CTS 406 CRYSTAL                                             
+R1   0 ohm        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R2   0 ohm        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R3   0 ohm        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R4   0 ohm        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R5   0 ohm        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R6   0 ohm        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R7   1k           R-US_R0805         R0805       RESISTOR, American symbol                                   
+R8   1k           R-US_R0805         R0805       RESISTOR, American symbol                                   
+R9   75           R-US_M0805         M0805       RESISTOR, American symbol                                   
+R10  10k          R-US_R0805         R0805       RESISTOR, American symbol                                   
+R11  0  ohm       R-US_R0805         R0805       RESISTOR, American symbol                                   
+R12  0 ohm        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R13  10k          R-US_R0805         R0805       RESISTOR, American symbol                                   
+R14  10k          R-US_R0805         R0805       RESISTOR, American symbol                                   
+R15  499          R-US_M0805         M0805       RESISTOR, American symbol                                   
+R16  47.5k        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R17  47.5k        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R18  47.5k        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R19  47.5k        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R20  47.5k        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R21  0 ohm        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R22  27           R-US_R0805         R0805       RESISTOR, American symbol                                   
+R23  27           R-US_R0805         R0805       RESISTOR, American symbol                                   
+R24  1.5k         R-US_R0805         R0805       RESISTOR, American symbol                                   
+R25  100k         R-US_R0805         R0805       RESISTOR, American symbol                                   
+R26  1k           R-US_M0805         M0805       RESISTOR, American symbol                                   
+R27  10k          R-US_R0805         R0805       RESISTOR, American symbol                                   
+R28  10k          R-US_R0805         R0805       RESISTOR, American symbol                                   
+R29  140          R-US_R0805         R0805       RESISTOR, American symbol                                   
+R30  1k           R-US_R0805         R0805       RESISTOR, American symbol                                   
+R31  0 ohm        R-US_R0805         R0805       RESISTOR, American symbol                                   
+R32  1k           R-US_R0805         R0805       RESISTOR, American symbol                                   
+R33  1k           R-US_R0805         R0805       RESISTOR, American symbol                                   
+S1                KSC241J            KSC241J     PUSH SWITCH                                                 
+T1                PMOSSOT23          SOT-23      MOS FET                                                     
+U$1               QUAD-CDEF          EDGE-CON8   Quad-Height CDEF DEC Edge Connector                         
+X1                F09HPS             F09HP       SUB-D                                                       
+X2                N7E50516           N7E50516    3M N7E50-7516-HG-40 Compact Flash Socket                    
+X3                PN61729            PN61729     BERG                                                        

@@ -1,0 +1,23 @@
+#
+
+MACRO11 = ../../macro11/macro11
+DUMP11 = ../../macro11/dumpobj
+
+TESTS = csr.mac csr2.mac dma0.mac dma1.mac dma2.mac dma3.mac dma4.mac regs1.mac
+#TESTS = dma0.mac 
+
+MEMS = $(TESTS:%.mac=%.mem)
+
+all: mems
+
+mems: $(MEMS)
+
+%.mem: %.mac
+	rm -f a.out
+	$(MACRO11) -o $*.obj -l $*.lst $<
+	$(DUMP11) $*.obj $*.mem
+
+
+clean:
+	rm -f *.mem *.obj *.lst
+

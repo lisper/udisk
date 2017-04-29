@@ -1,0 +1,13 @@
+	.TITLE dma2
+	.ASECT
+	.=0
+RLCS= 174400
+	.=1000
+	mov #RLCS,r0
+	mov #-256,6(r0)		; set the byte count
+	mov $14, (r0)
+; nop
+	tstb (r0)
+	bpl .-2
+	halt
+

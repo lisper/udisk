@@ -1,0 +1,40 @@
+AT91SAM7 USB specific firmware flash approach
+
+Milosch Meriac <meriac@bitmanufaktur.de>
+
+sam7utils: (C) 2006 Erik Gilling
+
+To make sure that the SAM7 interface will be recognized
+by the Linux Kernel please add the following line to
+/etc/modprobe.conf.local (or /etc/modprobe.conf if this
+file doesnt exist):
+
+options usbserial vendor=0x03EB product=0x6124
+
+
+(Re)Plug your device to make sure it will be detected properly.
+Find out which serial port its connected to (see last line
+- it's ttyUSB2 in this particular case):
+
+dmesg | grep ttyUSB
+ usb 3-1: pl2303 converter now attached to ttyUSB0
+ usb 5-2: FTDI USB Serial Device converter now attached to ttyUSB1
+ usb 1-7.2: generic converter now attached to ttyUSB2
+
+
+Install the latest firmware image:
+
+sam7 -l /dev/ttyUSB2
+    Chip Version: 0
+    Embedded Processor: ARM7TDMI
+    NVRAM Region 1 Size: 128 K
+    NVRAM Region 2 Size: 0 K
+    SRAM Size: 128 K
+    Series: AT91SAM7Sxx
+    Page Size: 256 bytes
+    Lock Regions: 8
+sam7> set_clock
+sam7> unlock_regions 
+    unlocking region 0: done
+    unlocking region 1: done
+sam7> flash myfirmware.img

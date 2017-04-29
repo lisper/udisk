@@ -1,0 +1,120 @@
+EAGLE Version 4.16r2 Copyright (c) 1988-2006 CadSoft
+
+Electrical Rule Check for /files2/projects/eagle/udisk/udisk.sch at 11/12/2013 08:53:11 
+
+WARNING: Sheet 4/7: unconnected Pin: U$1CU1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1CM1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1CL1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1CK1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1CJ1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1CF1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1CE1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1CD1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DV1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DU1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DS1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DR1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DP1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DN1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DM1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DK1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DJ1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DF1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DE1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DD1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DC1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DB1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DA1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1CB2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DV2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DU2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DJ2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1DB2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1ES1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1EN1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1EM1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1EB1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FV1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FU1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FS1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FR1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FP1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FN1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FL1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FK1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FH1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FF1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FE1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FC1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FB1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FA1 1
+WARNING: Sheet 4/7: unconnected Pin: U$1ET2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1ES2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1ER2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1EM2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1EL2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1EB2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FV2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FU2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FS2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FR2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FP2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FN2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FM2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FL2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FK2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FJ2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FH2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FF2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FE2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FD2 1
+WARNING: Sheet 4/7: unconnected Pin: U$1FB2 1
+WARNING: Sheet 5/7: unconnected Pin: X1-4 F
+WARNING: Sheet 5/7: unconnected Pin: X1-6 F
+WARNING: Sheet 5/7: unconnected Pin: X1-7 F
+WARNING: Sheet 5/7: unconnected Pin: X1-8 F
+WARNING: Sheet 5/7: unconnected Pin: X1-9 F
+WARNING: Sheet 5/7: unconnected Pin: X1-G G1
+WARNING: Sheet 5/7: unconnected Pin: X1-G G2
+WARNING: Sheet 5/7: unconnected Pin: X1-1 F
+WARNING: Sheet 1/7: POWER Pin IC12 PA31 connected to CPLD_CLK
+WARNING: Sheet 1/7: POWER Pin IC12 PA14_PGMD2 connected to CPU_D14
+WARNING: Sheet 1/7: POWER Pin IC12 PA13_PGMD1 connected to CPU_D13
+WARNING: Sheet 2/7: POWER Pin IC1V1 VCC connected to +3V3
+WARNING: Sheet 2/7: POWER Pin IC1V2 VCC connected to +3V3
+WARNING: Sheet 2/7: POWER Pin IC1V3 VCC connected to +3V3
+WARNING: Sheet 2/7: POWER Pin IC1V4 VCC connected to +3V3
+WARNING: Sheet 2/7: POWER Pin IC1V5 VCC connected to +3V3
+WARNING: Sheet 2/7: POWER Pin IC1V6 VCC connected to +3V3
+WARNING: Sheet 2/7: POWER Pin IC1V7 VCC connected to +3V3
+WARNING: Sheet 2/7: POWER Pin IC1V8 VCC connected to +3V3
+WARNING: Sheet 2/7: POWER Pin IC1V9 VCC connected to +3V3
+WARNING: Sheet 2/7: POWER Pin IC1V10 VCC connected to +3V3
+WARNING: Sheet 2/7: POWER Pin IC1V11 VCC connected to +3V3
+WARNING: Sheet 5/7: POWER Pin IC2P VCC connected to +5V
+WARNING: Sheet 5/7: POWER Pin IC3P VCC connected to +5V
+WARNING: Sheet 5/7: POWER Pin IC4P VCC connected to +5V
+WARNING: Sheet 5/7: POWER Pin IC5P VCC connected to +5V
+WARNING: Sheet 5/7: POWER Pin IC6P VCC connected to +5V
+WARNING: Sheet 5/7: POWER Pin IC7P VCC connected to +5V
+WARNING: Sheet 5/7: POWER Pin IC8P VCC connected to +5V
+WARNING: Sheet 5/7: POWER Pin IC9P VCC connected to +5V
+WARNING: Sheet 5/7: POWER Pin IC10P VCC connected to +5V
+WARNING: Sheet 5/7: POWER Pin IC13 VCC connected to +3V3
+WARNING: Only 1 Pin on net AC_LO_L
+WARNING: Only 1 Pin on net A_IN
+WARNING: Only 1 Pin on net BG6_IN
+WARNING: Only 1 Pin on net BG6_OUT
+WARNING: Only 1 Pin on net BG7_IN
+WARNING: Only 1 Pin on net BG7_OUT
+WARNING: Only 1 Pin on net BR6_L
+WARNING: Only 1 Pin on net BR7_L
+WARNING: Only 1 Pin on net B_RESET_L
+WARNING: Only 1 Pin on net DC_LO_L
+WARNING: Only 1 Pin on net HALT_GRANT_L
+WARNING: Only 1 Pin on net HALT_REQ_L
+
+Board and schematic are consistent
+
+    0 errors
+  111 warnings

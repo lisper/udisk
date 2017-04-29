@@ -1,0 +1,15 @@
+; more complex csr read
+	.TITLE csr
+	.ASECT
+	.=0
+data:	.word	0
+
+RLCS= 174400
+RLBA= 174402
+RLDA= 174404
+RLMP= 174406
+	.=1000
+	mov #RLCS,r0
+loop:
+	tstb	(r0)
+	br	loop

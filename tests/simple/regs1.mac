@@ -1,0 +1,87 @@
+;
+;
+;
+	.TITLE regs1
+	.ASECT
+	.=0
+RLCS= 174400
+RLBA= 174402
+RLDA= 174404
+RLMP= 174406
+	.=1000
+loop:
+	mov #RLDA,r0
+;
+; increment register
+;
+test1:
+	mov #1,r2
+	mov (r0), r1
+	mov r2,(r0)	;1
+	inc (r0)	;2
+	inc (r0)	;3
+	inc (r0)	;4
+	mov (r0),r3
+	cmp #4,r3
+	beq test2
+	hlt
+;
+; bis register (r-m-w)
+;
+test2:
+	mov (r0), r1
+	clr (r0)	;000
+	bis #10,(r0)	;010
+	bis #20,(r0)	;030
+	bis #01,(r0)	;031
+	mov (r0),r3
+	cmp #31,r3
+	beq test3
+	hlt
+;
+; bic register (r-m-w)
+;
+test3:
+	mov #0777,r2
+	mov (r0), r1
+	mov r2,(r0)	;777
+	bic #10,(r0)	;767
+	bic #20,(r0)	;747
+	bic #01,(r0)	;746
+	mov (r0),r3
+	cmp #746,r3
+	beq test4
+	hlt
+;
+; byte read reg
+;
+test4:
+	mov #RLCS,r0
+	tstb (r0)
+	tstb (r0)
+	tstb (r0)
+	br   test5
+;
+; hammer cs in loop
+;
+test5:
+	mov #RLCS,r0
+	mov #14,r5
+	mov #0,4(r0)
+	mov r5,(r0)
+loop5:
+	tstb (r0)
+	bpl loop5
+;
+	mov #0,4(r0)
+	mov r5,(r0)
+loop5a:
+	tstb (r0)
+	bpl loop5a
+
+	br test6
+;
+test6:
+	br loop
+
+

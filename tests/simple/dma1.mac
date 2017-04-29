@@ -1,0 +1,10 @@
+	.TITLE dma1
+	.ASECT
+	.=0
+RLCS= 174400
+	.=1000
+	mov #RLCS,r0
+loop:
+	tstb	(r0)
+	jmp	loop
+

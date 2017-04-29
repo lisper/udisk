@@ -1,0 +1,147 @@
+GPLCVER_2.12a of 05/16/07 (Linux-elf).
+Copyright (c) 1991-2007 Pragmatic C Software Corp.
+  All Rights reserved.  Licensed under the GNU General Public License (GPL).
+  See the 'COPYING' file for details.  NO WARRANTY provided.
+Today is Thu Nov  7 08:09:32 2013.
+Compiling source file "udisk_test.v"
+Highest level modules:
+udisk_test
+
+read_reg 7 ->
+read_reg 7 -> a55a
+read_reg 7 ->
+read_reg 7 -> a55a
+read_reg 7 ->
+read_reg 7 -> a55a
+write_reg 1 <- 0000
+write_reg 1 <- 0001
+write_reg 1 <- 0000
+write_reg 1 <- 0200
+write_reg 1 <- 0000
+write_reg 1 <- 0001
+write_reg 1 <- 0002
+write_reg 1 <- 0004
+write_reg 1 <- 0008
+write_reg 1 <- 0100
+write_reg 1 <- 0200
+write_reg 1 <- 0400
+write_reg 1 <- 0800
+write_reg 1 <- 1000
+write_reg 1 <- 2000
+write_reg 1 <- 4000
+write_reg 1 <- 8000
+write_reg 1 <- 0000
+
+----- bus data path;   219ns -----
+write_reg 1 <- 4000
+write_reg 6 <- 1234
+bus_data_hold 1234, dir 1, bus 0000;   242ns
+test bus data; BUS_DATA 1234
+write_reg 1 <- 0000
+write_reg 6 <- a500
+bus_data_hold a500, dir 0, bus zzzz;   272ns
+read_reg 6 ->
+read_reg 6 -> a500
+read bus pattern; data a500
+write_reg 6 <- 005a
+bus_data_hold 005a, dir 0, bus zzzz;   288ns
+read_reg 6 ->
+read_reg 6 -> 005a
+read bus pattern; data 005a
+
+----- test bus address path;   301ns -----
+write_reg 4 <- 0003
+hi addr_out 3
+write_reg 5 <- 1234
+lo addr_out 1234
+write_reg 1 <- 8000
+test bus addr; BUS_ADDR 31234
+write_reg 1 <- 0000
+
+---- unibus - address match, all ones;   341ns -----
+write_reg 2 <- ffff
+write_reg 7 <- 05ff
+write_reg 7 <- 0500
+** cpu_int=1
+** cpu_int=1
+wait for ssyn;   373ns
+got ssyn;   373ns
+got ssyn; BUS_DATA 3456
+read_reg 6 ->
+read_reg 6 -> 3456
+addr match; data 3456
+write_reg 2 <- 0000
+
+---- unibus - address non-match;   403ns -----
+wait for ssyn;   405ns
+TIMEOUT waiting for ssyn;   606ns
+write_reg 2 <- 0000
+
+---- unibus - address match, cpu write;   630ns -----
+write_reg 2 <- 8888
+write_reg 7 <- 05ff
+write_reg 7 <- 0500
+** cpu_int=1
+** cpu_int=1
+** cpu_int=1
+wait for ssyn;   674ns
+got ssyn;   674ns
+got ssyn; BUS_DATA 0000
+read_reg 6 ->
+read_reg 6 -> 0000
+addr match, mixed, cpu write; data 0000
+write_reg 2 <- 0000
+
+---- unibus - address match, cpu read;   704ns -----
+write_reg 2 <- 8888
+write_reg 7 <- 05ff
+write_reg 6 <- 5678
+** cpu_int=1
+bus_data_hold 5678, dir 0, bus zzzz;   740ns
+** cpu_int=1
+** cpu_int=1
+** cpu_int=1
+** cpu_int=1
+write_reg 7 <- 0500
+** cpu_int=1
+** cpu_int=1
+** cpu_int=1
+wait for ssyn;   758ns
+got ssyn;   758ns
+got ssyn; BUS_DATA 5678
+read_reg 6 ->
+read_reg 6 -> 5678
+addr match, mixed, cpu read; data 5678
+write_reg 2 <- 0000
+
+---- unibus - dma mode;   786ns -----
+write_reg 7 <- 0401
+write_reg 4 <- 0003
+hi addr_out 3
+write_reg 5 <- 1234
+lo addr_out 1234
+write_reg 1 <- c000
+write_reg 6 <- 1111
+bus_data_hold 1111, dir 1, bus 5678;   828ns
+wait for msyn;   836ns
+got msyn;   836ns
+got msyn; BUS_DATA 1111
+got ~msyn;   840ns
+addr_incr 00031236
+write_reg 6 <- 2222
+bus_data_hold 2222, dir 1, bus 1111;   852ns
+wait for msyn;   860ns
+got msyn;   860ns
+got msyn; BUS_DATA 2222
+got ~msyn;   864ns
+addr_incr 00031238
+write_reg 6 <- 3333
+bus_data_hold 3333, dir 1, bus 2222;   876ns
+wait for msyn;   884ns
+got msyn;   884ns
+got msyn; BUS_DATA 3333
+got ~msyn;   888ns
+addr_incr 0003123a
+write_reg 7 <- 0400
+Halted at location **udisk_test.v(541) time 908 from call to $finish.
+  There were 0 error(s), 0 warning(s), and 92 inform(s).

@@ -1,0 +1,293 @@
+;
+; very simple RL02 controller diagnostic
+; check register access and basic commands
+; brad@heeltoe.com 1/2011
+;
+	.TITLE rltest
+	.ASECT
+
+RLCS= 174400		;RL02
+RLBA= 174402
+RLDA= 174404
+RLMP= 174406
+
+TKS= 177560		;TTY KBD STATUS
+TKB= 177562		;TTY KBD BUFFER
+TPS= 177564		;TTY PRINTER STATUS REG. ADDRESS
+TPB= 177566		;TTY PRINTER BUFFER REG. ADDRESS
+
+;
+; boot sector - read in reset of code (bootstrap reads 0-777)
+;
+	.=0
+boot:
+	mov #RLCS,r0
+	mov #1000,2(r0)		; ba = 1000
+	mov #2,4(r0)		; da = 1
+	mov #-4096.,6(r0)	; set wc
+	mov #14,(r0)		; read
+
+	tstb (r0)		; wait
+	bpl .-2
+
+	bit #100000,(r0)
+	beq ok
+	halt
+ok:
+	jmp @#start
+
+; -------------------------------------------------------------
+
+;
+; code from disk...
+;	
+	.=400
+	br	start
+
+start:
+	mov	#10000,sp
+	jsr	pc,@#type
+	.word	shdr
+
+	mov	#3,r5
+loop:
+	jsr	pc,@#type
+	.word	sline
+	jsr	pc,chkrg
+	jsr	pc,chksk
+	jsr	pc,chkrd
+
+	jsr	pc,chkrg
+	jsr	pc,chksk
+	jsr	pc,chkrd
+
+	dec	r5
+	bne	loop
+
+done:
+	jsr	pc,@#type
+	.word	sdone
+	jsr	pc,@#crlf
+	halt
+
+crlf:
+	jsr	pc,@#type
+	.word	scrlf
+	rts	pc
+
+; -------------------------------------------------------------
+
+shdr:
+	.ascii	<15><12>
+	.asciz	/start!/
+
+sdone:
+	.ascii	<15><12>
+	.asciz	/done./	
+
+scrlf:
+	.ascii	<15>
+	.asciz	<12>
+
+sline:	.ascii	<15><12>
+	.asciz  /------------------------/
+
+
+schkrg:
+	.ascii	<15><12>
+	.asciz	/regs:/	
+schksk:
+	.ascii	<15><12>
+	.asciz	/seek:/	
+schkrd:
+	.ascii	<15><12>
+	.asciz	/read:/	
+
+;
+	.even
+type:
+	mov	r0,-(sp)	; save r0
+	mov	@2(sp),r0
+2$:	movb	(r0)+,-(sp)	; push char
+	beq	4$		; done?
+	jsr	pc,@#typec
+	tst	(sp)+		; pop char
+	br	2$
+4$:
+	tst	(sp)+		; pop char
+	mov	(sp)+,r0	; restore r0
+	add	#2,(sp)
+	rts	pc
+
+;
+typec:
+	tstb	@#TPS
+	bpl	typec	
+	movb	2(sp),@#TPB
+;
+1$:	tstb	@#TPS
+	bpl	1$
+;
+	rts	pc
+
+; -------------------------------------------------------------
+
+;
+; regs 
+;
+chkrg:
+	jsr	pc,@#type
+	.word	schkrg
+	jsr	pc,chkrw0		; check reg read/write
+	jsr	pc,chkrw1
+	jsr	pc,chkrw2
+	jsr	pc,chkrw3
+	jsr	pc,chkcs1		; check cs tstb reads in loop
+	rts pc
+
+;
+; read/write register
+;
+chkrw0:
+	mov #RLDA,r0
+	mov #0,r2
+	mov (r0), r1
+	mov r2,(r0)
+	mov (r0), r1
+	cmp r1,r2
+	beq 1$
+	halt
+1$:
+	mov #177777,r2
+	mov (r0), r1
+	mov r2,(r0)
+	mov (r0), r1
+	cmp r1,r2
+	beq 2$
+	halt
+2$:
+	mov #1234,r2
+	mov (r0), r1
+	mov r2,(r0)
+	mov (r0), r1
+	cmp r1,r2
+	beq 3$
+	halt
+3$:
+	rts pc
+
+;
+; inc register (r-m-w)
+;
+chkrw1:
+	mov #RLDA,r0
+	mov #1,r2
+	mov (r0), r1
+	mov r2,(r0)	;1
+	inc (r0)	;2
+	inc (r0)	;3
+	inc (r0)	;4
+	mov (r0),r3
+	cmp #4,r3
+	beq 1$
+	halt
+1$:
+	rts pc
+
+;
+; bis register (r-m-w)
+;
+chkrw2:
+	mov #RLDA,r0
+	mov (r0), r1
+	clr (r0)	;000
+	bis #10,(r0)	;010
+	bis #20,(r0)	;030
+	bis #01,(r0)	;031
+	mov (r0),r3
+	cmp #31,r3
+	beq 1$
+	halt
+1$:
+	rts pc
+
+;
+; bic register (r-m-w)
+;
+chkrw3:
+	mov #RLDA,r0
+	mov #0777,r2
+	mov (r0), r1
+	mov r2,(r0)	;777
+	bic #10,(r0)	;767
+	bic #20,(r0)	;747
+	bic #01,(r0)	;746
+	mov (r0),r3
+	cmp #746,r3
+	beq 1$
+	halt
+1$:
+	rts pc
+
+;
+; do commmand, wait for completion while polling RLCS
+;
+chkcs1:
+	mov #RLCS,r0
+	mov #6,r1		; seek
+;
+	mov #0,4(r0)		; da = 0
+	mov r1,(r0)
+	tstb (r0)
+	bpl .-2
+;
+	mov #0,4(r0)		; again
+	mov r1,(r0)
+	tstb (r0)
+	bpl .-2
+
+	rts pc
+
+;
+; *** seek ***
+;
+chksk:
+	jsr	pc,@#type
+	.word	schksk
+
+	mov #RLCS,r0
+	mov #6,r1		; seek
+;
+	mov #0,4(r0)		; da = 0
+	mov r1,(r0)
+	tstb (r0)		; wait
+	bpl .-2
+;
+	mov #0,4(r0)		; again
+	mov r1,(r0)
+	tstb (r0)
+	bpl .-2
+
+	rts pc
+
+;
+; *** read ***
+;
+chkrd:
+	jsr	pc,@#type
+	.word	schkrd
+
+	mov #RLCS,r0
+	mov #20000,2(r0)	; ba = 20000
+	mov #1,4(r0)		; da = 1
+	mov #-4096.,6(r0)	; set wc
+	mov #14,(r0)		; read
+
+	tstb (r0)		; wait
+	bpl .-2
+
+	bit #100000,(r0)	; error?
+	beq 1$
+	halt
+1$:
+	rts pc

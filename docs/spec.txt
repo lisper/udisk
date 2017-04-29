@@ -1,0 +1,680 @@
+Brad Parker
+brad@heeltoe.com
+original 2/2005
+updated 11/2013
+
+Specification / Principles of Operation - UDisk unibus device
+
+Goals
+-----
+
+Create a low cost unibus adapter card which can emulate a small number
+of popular controllers (RL11, RK11, UDA50, etc) and use an IDE or CF disk
+as the actual media.
+
+Make it easy for others to write personality modules for different
+controllers.
+
+Should allow use of a IDE/CF disk to boot a PDP-11 (or vax or pdp-10).
+
+Contraints
+----------
+
+- electrically "UNIBUS compliant" (use DS3862N, DS8641)
+- minimal chip count
+- reasonable performace (design center is 11/44)
+- tools to program should be free or freely available (ideally gnu)
+- small pin count SMT, nothing more than 48 pins (easy to hand solder)
+- easy for others to replace/modify cpu firmware
+
+Concept
+-------
+
+Use a small pin count ARM7 cpu (like Atmel AT91SAM7S256) and a small
+CPLD (like Xilinx Coolrunner XR3256).  Use the pio pins on the
+Atmel to form an internal 8 bit bus linking to the xilinx cpld.
+
+cpu <-- bus --> cpld <--> CF/IDE
+                 ^
+                 |
+         +-------+-------+
+         |       |       |
+        DS8641 DS3862 DS3862
+         |       |       |
+         v       v       v
+       UNIBUS  UNIBUS  UNIBUS
+        ADDR / CONTROL DATA
+
+The idea is that the cpu, using interrupts services all the bus
+transactions.  The cpld acts as an address latch/address comparitor
+and interrupts the cpu when an address match occurs (basically BBSY +
+MSYN + proper address).
+
+The original idea was to have the CPU drive SSYN and complete the
+transaction.  But this proved too slow.  The hardware still supports it,
+but it was too slow in practive and bus timeouts occured.
+
+A revision to the CPLD allowed the cpld to have a simple state machine
+which handles the MSYN/SSYN handshake and buffers a sinlge transfer.
+The cpu then services the cpld and the cycle can repeat.
+
+When the CPU needed to become the bus master (for interrupts or data
+transfers) it asserts NPR / BRx / MSYN and runs most of the
+transaction "by hand".  Data transfers are done via the simple
+MSYN/SSYN state machines, one for the master siside and one for the
+slave side.
+
+The worst case is when the PDP-11 cpu is constantly polling a status
+register in a loop.  This causes the ARM cpu to be constantly
+interrupted.  Fortunately there are stil enough free cycles to
+complete an IDE transaction (disk read, for example) in the background.
+
+Almost all of the ARM code is in C, with the exception of the IRQ
+entry/exit and startup code.  The disk controller "personality" code
+is all in C.  Emulating a new device is just a matter of servicing
+register read/write requests.
+
+The ARM code includes a simple bootloader which allows the arm cpu
+flash to be reprogrammed via USB.  It would be easy to extend this
+to allow reprogramming from a file on the CF disk.
+
+The CF is not hot-swappable.  It might make sense to allow the cpu to
+control the CF power, so that if a CF was swapped and INIT asserted
+the CF power could be cycles to put the device back in "true IDE mode"
+(there by allowing a 'poor mans hot swap' without the extra buffers
+required for true hot swap).  Right now the CF power is always on.
+
+It is also possible to simulate memory, namely ROM.  The original
+CPLD code included two address "match" registers, but I removed the
+second one as I ran out of space.
+
+Details
+-------
+
+Unibus adapter, quad width (slots C-F) for "SPC prime".
+4 layer .062" board; initially HASL, gold fingers in 'production'
+Mixed SMT & through-hole
+
+Address base programmable
+BR4/BR5 for interrupts, vector programmable
+NPG for dma transfers
+
+Use +5 for all parts except cpu, which has 5v tolerant i/o.  CPU/CF
+power provided by a +3.3v LDO.
+
+LED for power
+LED for status
+LED for IDE disk activity
+
+CPLD JTAG
+CPU JTAG
+RS-232 serial header
+CF slot
+IDE header
+
+PCB has "split power plane".  Approximately 50% of the power plane is
+the +5v from the UNIBUS. The other 50% is +3.3v for the CPU and CPLD.
+There is also a small island for cpu power.
+
+
+CPLD Notes
+----------
+
+CPLD multiplexes between ide disk bus and unibus data bus.  It
+provides basic support for the unibus protocol, performing address
+detection and msyn/ssyn read/write cycles.
+
+- cpu performs read/writes to cpld registers
+    bus signal status
+    interrupt status
+    match address w/mask
+    read matched address
+    bg pass thru enable
+
+
+- if BBSY_L && MSYN_L & Axx compare - generate cpu interrupt
+
+- bus grant signals can be "disconnected" to keep other devices from
+getting the bus.
+
+
+CPLD registers
+--------------
+
+ addr   write                           read
+ ----   -----                           ----
+ 0000	write pass-thru
+ 0001	write assert pins		read status
+ 0010	write addr match 1 addr		read match addr hi
+ 0011	write addr match 1 mask		read match addr lo
+ 0100	write addr buffer hi
+ 0101	write addr buffer lo
+ 0110	write data buffer		read bus data
+ 0111	subreg				id
+      01	write cpu int reset
+      02	write LED
+      03	write cf enable/reset
+      04	dma mode
+      05	cpu release
+
+WRITE
+
+0000 pass-thru
+    bit 7
+    bit 6
+    bit 5
+    bit 4
+    bit 3 NPR_L
+    bit 2 BR5_L
+    bit 1 BR4_L
+    bit 0
+
+0001 assert pins
+    bit 7
+    bit 6 NPG_OUT  (only if assoc pass_thru bit == 1)
+    bit 5 BG4_OUT  (only if assoc pass_thru bit == 1)
+    bit 4 BG4_OUT  (only if assoc pass_thru bit == 1)
+    bit 3 NPR_L    (actual bus signal inverted, so write 1 -> assert on bus low)
+    bit 2 BR5_L    (actual bus signal inverted, so write 1 -> assert on bus low)
+    bit 1 BR4_L    (actual bus signal inverted, so write 1 -> assert on bus low)
+    bit 0 INTR_L   (actual bus signal inverted, so write 1 -> assert on bus low)
+
+
+READ
+
+0000 
+    bit 7 bus C1
+    bit 6 bus C0
+    bit 5 latched bus addr [5:0]
+    ...
+    bit 0
+
+0001 - status
+    bit 15 CPU_INT
+    bit 14 pending dma (state machine is primed)
+    bit 13 match status
+    bit 12 master state machine idle
+    bit 11 master state machine busy
+    bit 10 slave state machine state
+    bit 9  slave state machine state
+    bit 8  slave state machine state
+    bit 7  BBSY_IN
+    bit 6  C1_IN
+    bit 5  C0_IN
+    bit 4  SACK_IN
+    bit 3  BR4_IN
+    bit 2  BR5_IN
+    bit 1  NPG_IN
+    bit 0  INIT_IN
+
+0010 - 
+    bit 7 master state machine state
+    ...
+    bit 2
+    bit 1 latched bus addr [17]
+    bit 0 latched bus addr [16]
+
+0011 - bus addr
+    bit 7 latched bus addr [15:0]
+    ...
+    bit 0
+
+0110 - latched bus data
+
+0111 - cpld id register
+    0xa5a3
+
+
+
+CPU Signals
+-----------
+
+16 bit bus to cpld
+       	        i/o(16) gpio PA0-PA15
+
+usb pullup      o       gpio PA16
+cpld a0         o	gpio PA17
+cpld a1         o	gpio PA18
+cpld a2         o	gpio PA19
+cpld a3         o	gpio PA20
+PA21 - rxd1
+PA22 - txd1
+cpld rd		o	gpio PA23
+cpld wr		o	gpio PA24
+cpld int	i	gpio PA25
+
+PA26 - unused
+
+SSYN_L		i	gpio PA27 (assert via cpld)
+MSYN_L		i	gpio PA28 (assert via cpld)
+BBSY_L		i	gpio PA29 (assert via cpld)
+
+PA30 - unused
+PA31 - cpld clk pck2
+
+INTR_L		out	assert via cpld
+BR4_L		out	assert via cpld
+BG4_OUT		out	assert via cpld
+BR5_L		out	assert via cpld
+BG5_OUT		out	assert via cpld
+NPR_L		out	assert via cpld
+NPG_OUT		out	assert via cpld
+
+C0_L		in	read via cpld
+C1_L		in	read via cpld
+SACK_L		in	read via cpld (assert via cpld)
+INIT_L		in	read via cpld
+BG4_IN		in	read via cpld
+BG5_IN		in	read via cpld
+NPG_IN		in	read via cpld
+
+------
+
+READ/WRITE
+
+idle	SSYN in
+	MSYN in
+	BBSY in
+	data in
+	addr in
+
+ack	SSYN out
+
+INTERRUPT
+
+start	BGx out
+ack	SACK out
+
+wait	BBSY in
+	SSYN in
+
+master	BBSY out
+	INTR out
+	data out
+
+NPR
+	NPR out
+	SACK out
+	BBSY in
+
+	BBSY out
+
+
+Unibus Transactions Psuedo code
+-------------------------------
+
+Register read/write:
+
+  clear cpld int ena
+  set address & mask
+  set cpld int ena
+  wait for BBSY/MSYN/addr-match interrupt
+
+  at interrupt
+   sample C0,C1
+   (c1==0->read,c1==1->write;c0==0->16bit,c0==1->8bit,
+   A00==1 use D<15:08>,A00==0 use D<07:00>)
+
+   if read, calculate result and write to cpld data register
+     cpld completes transation
+
+   if write, read cpld data register
+     cpld completes transation
+
+   release cpld state machine
+
+   notice if we are in a DATIP (r-m-w) cycle
+     if so, handle subsequent write cycle
+
+
+Interrupt:
+
+  disable BRx pass-thru w/cpld
+  assert BRx
+  wait for BGx
+
+  assert SACK
+  deassert BRx
+  wait for BGx to deassert
+
+  wait for BBSY to deassert
+
+  assert BBSY
+  assert data (w/vector)
+
+  wait for SSYN to be deasserted
+
+  assert INTR
+  deassert SACK
+
+  wait for SSYN
+
+  deassert data
+  deassert INTR
+  deassert BBSY
+  enable BRx pass-thru w/cpld
+
+
+
+Bus Master (NPR):
+
+  disable NPG pass-thru w/cpld
+  assert NPR
+  wait for NPG
+  assert SACK
+  deassert NPR
+  wait for NPG to deassert
+
+  wait for BBSY to deassert
+  assert BBSY
+
+  prime cpld for dma transfer
+    write addr
+    set dma mode
+
+  if write
+    write data to cpld (starts master state machine)
+
+  if read
+    wait for cpld state machine to go idle
+  
+  enable NPG pass-thru w/cpld
+  deassert SACK
+  deassert BBSY
+  deassert NPG
+
+
+Unibus Signal Grouping
+----------------------
+
+READ/WRITE:
+signal dir
+BBSY	i
+MSYN	i
+SSYN	i
+C0	i
+C1	i
+
+SSYN	o	assert
+
+INTERRUPT:
+signal dir
+BBSY	i
+MSYN	i
+SSYN	i
+C0	i
+C1	i
+SACK	i
+
+BRx	o
+BGx	i
+
+SACK	o
+
+BBSY	o
+INTR	o
+
+NPR:
+signal dir
+BBSY	i
+MSYN	i
+SSYN	i
+C0	i
+C1	i
+SACK	i
+
+NPR	o
+SACK	o
+BBSY	o
+
+MSYN	o
+
+-----------
+
+E&F slots - ignore?
+
+ES2 SELECT 0 H		need
+ET2 SELECT 2 H		need
+ER2 SELECT 4 H
+ES1 SELECT 8 H
+EM2 OUT HIGH H		
+EN1 OUT LOW H		need
+EM1 IN H		need
+x EF2 BUS C1 L
+x EJ2 BUS C0 L
+x EJ1 BUS SSYN L
+- EB1 SSYN INHIBIT
+
+x EE1 BUS MSYN L
+
+x FT2 BUS SACK L
+x FC1 BUS SSYN L
+
+FL2 INTR DONE A H
+FW2 INTR DONE B H
+FN1 MASTER A L
+FS2 MASTER B L
+FU2 BUS REQUEST L
+
+FU1 RDR DONE H
+FV1 RDR INT ENB B
+FB1 BG IN H
+
+FK2 PUN READY H		need
+FH2 PUN INT ENB H	pulled up?
+FA1 BG OUT H
+
+
+Unibus Signal paths
+-------------------
+
+bus		interface	on-board
+---		---------	--------
+
+8641 disables tied low
+
+MSYN_L		8641		gpio PA27/B_MSYN_IN, B_MSYN_OUT
+SSYN_L		8641		gpio PA28/B_SSYN_IN, B_SSYN_OUT
+BBSY_L		8641		gpio PA29/B_BBSY_IN, B_BBSY_OUT
+SACK_L		8641		B_SACK_IN, B_SACK_OUT
+
+8641 disables tied low
+
+C0_L		8641		gpio PA30/B_C0_IN, B_C0_OUT
+C1_L		8641		gpio PA31/B_C1_IN, B_C1_OUT
+
+3862
+
+INIT_L		8641		B_INIT_IN
+BG4_IN		8641		B_BG4_IN
+BG5_IN		8641		B_BG5_IN
+NPG_IN		8641		B_NPG_IN
+
+3862
+
+INTR_L		8641 		B_INTR_OUT
+BR4_L		8641		B_BR4_OUT
+BR5_L		8641		B_BR5_OUT
+NPR_L		8641		B_NPR_OUT
+BG4_OUT		8641		B_BG4_OUT
+BG5_OUT		8641		B_BG5_OUT
+NPG_OUT		8641		B_NPG_OUT
+
+Axx_L		3862		BUS_ADDR
+		dir signal	    cpld, BUS_ADDR_DIR (1=assert on bus)
+
+Dxx_L		3862		BUS_DATA
+		latch/data-3862 dir gpio PA25, BUS_DATA_DIR
+
+
+IDE/ATA Interface
+-----------------
+
+drive a0-a2	- same as cpld
+cs1, cs3	- from cpld
+iord		- same as cpld
+iowr		- same as cpld
+
+		RESET-	1  2  gnd	gnd
+		d7	3  4  d8
+		d6	5  6  d9
+		d5	7  8  d10
+		d4	9  10 d11
+		d3	11 12 d12
+		d2	13 14 d13
+		d1	15 16 d14
+		d0	17 18 d15
+		gnd	19 20 (keypin)
+		DMARQ	21 22 gnd
+		IOWR-	23 24 gnd
+		IORD-	25 26 gnd
+		IORDY	27 8  CSEL
+		DMACK-	29 30 gnd
+		INTRQ	31 32 IOCS16- (obsolete)
+		A1	33 34 PDIAG-
+		A0	35 36 A2
+		CS1-	37 38 CS3-
+		DASP-	39 40 gnd
+
+		+5	41 42 +5
+		gnd	43 44 reserved
+
+IDE is 40 pin .1" connector (2x20)
+
+2.5" is 44 pin 2mm connector (2x22)
+
+
+
+CF CARD SIGNALS
+---------------
+
+drive a0-a2
+cs0, cs1
+iord
+iowr
+
+		GND	1  26 CD1#
+		D3	2  27 D11
+		D4	3  28 D12
+		D5	4  29 D13
+		D6	5  30 D14
+		D7	6  31 D15
+		CS0#	7  32 CS1#
+		A10	8  33 VS1#
+		ATASEL#	9  34 IORD#
+		A9	10 35 IOWR#
+		A8	11 36 WE#
+		A7	12 37 INTRQ
+		VCC	13 38 VCC
+		A6	14 39 CSEL#
+		A5	15 40 VS2#
+		A4	16 41 RESET#
+		A3	17 42 IORDY
+		A2	18 43 INPACK#
+		A1	19 44 REG#
+		A0	20 45 DASP#
+		D0	21 46 PDIAG#
+		D0	22 47 D8
+		D2	23 48 D9
+		IOCS16#	24 49 D10
+		CD2#	25 50 GND
+
+CS0#	7 card select 0 Connect to chip select 0
+CS1#	32 card select 1 Connect to chip select 1
+IORD#	34 I/O read strobe Connect to GPL1
+IOWR#	35 I/O write strobe Connect to GPL2
+
+A0-A10	20,19,18,17,16,15,14,12,11,10,8
+	Address bit 0-10 Connect A0-A2, ground A3-A10
+
+D0-D15	21,22,23,2,3,4,5,6,47,48,49,27,28,29,30,31
+	data bits 0-15 Connect to data bus bits 0-15
+	Note: Bit 0 is the LSB and bit 15 is the MSB for the CompactFlash.
+
+INTRQ	37 Interrupt request to host Optional interrupt request to host
+
+OE#
+ATA SEL# 9
+	Enables True IDE Mode Connect to ground
+
+IOIS16#	24
+	16 bit transfer Not connected (host assumes 16 bit transfer)
+
+CD1#, CD2# 26, 25
+	card detect Not connected (hot insertion not supported)
+
+VS1#, VS2# 33, 40
+	Voltage sense Not connected
+
+WE#	36 write enable Not used in True IDE mode (connect to Vcc)
+
+CSEL#	39 cable select (master/slave) Connect to ground (enable card as master)
+RESET#	41 resets CF Connect to system power on reset
+
+IORDY	42 I/O ready Not connected
+
+INPACK#	43 input acknowledge Not connected
+
+REG#	44 Attribute memory enable Not used in True IDE mode (connect to Vcc)
+
+DASP#	45 drive active/slave present Not connected (no slave drive)
+
+PDIAG#	46 Passed diagnostic Not connected (no slave drive)
+
+
+
+ARM CPU Flash Memory
+--------------------
+
+SAMBA "boot recovery" is not used.
+
+- tie TST, PA0, PA1, PA2 all high at reset
+- PIOA16 dedicated to usb pullup
+
+Instead, the arm "loader" code implements the SAM-BA protocol as a USB
+ACM device.  The loader program listens to the CPU serial port at
+reset (9600-8N1).  If a key is hit in the first three (3) seconds, it
+stops in the bootloader and becomes present on the USB bus.  The
+"sam7utils" program can then be used to update the arm cpu flash
+memory.
+
+ARM CPU Bootloader
+------------------
+
+The bootloader is designed to do two things - update the flash and
+load flash code into ram.  It prints out a short banner on the serial
+port (9600, 8N1) and waits 3 seconds.  If any key is hit within 3
+seconds it will drop into the USB update code and register itself on
+the USB port.  The USB port acts as an ACM device and should automatically
+show up in the linux /dev directory as /dev/ttyACM0 or /dev/ttyACM1.  You can
+use any terminal program or the supplied "sam7utils" to talk to the SAM-BA
+implementation in the bootloader.
+
+If the bootloader does not detect serial input it copies a portion of
+the flash into ram and starts executing out of ram.  The disk
+controller code runs out of ram for speed.  The sram is zero wait
+state.  Running out of flash incures multiple wait states and is
+slower.
+
+Currently the bootloader only loads controller ram image #1.
+
+Flash Layout:
+
+page	contents
+
+0-255	loader
+256-    controller ram image #1
+512-    controller ram image #2
+768-    controller ram image #3
+
+
+IDE/CF Disk Structure
+---------------------
+
+The controller code will honor a DOS partitiion map if present.  If
+not, the entire disk is used and interpreted as sequential blocks.
+Basically you can just use the linux "dd" command to copy an existing
+RL02 or RK05 image to a CF disk and use it.
+
+If there are multiple paritions, they are mapped to multiple RL02 or RK05 "units"
+

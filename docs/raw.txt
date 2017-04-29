@@ -1,0 +1,661 @@
+Brad Parker
+brad@heeltoe.com
+original 2/2005
+updated 2/2006
+
+Goal
+----
+
+Create a low cost unibus adapter card which can emulate a small number
+of popular controllers (RL11, UDA50, etc) and use an IDE or CF disk as
+the actual media.
+
+Make it easy for others to write personality modules for different
+controllers.
+
+Should allow use of a IDE/CF disk to boot a PDP-11 (or vax).
+
+Contraints
+----------
+
+- electrically "UNIBUS compliant" (use DS3862N, DS8641)
+- minimal chip count
+- reasonable performace (design center is 11/44)
+- tools to program should be free or freely available (ideally gnu)
+- small pin count SMT, nothing more than 48 pins (easy to hand solder)
+- easy for others to replace/modify cpu firmware
+
+Concept
+-------
+
+Use a small pin count ARM7 cpu (like Atmel AT91SAM7S64) and a small
+CPLD (like Xilinux Coolrunner-II XC2C128).  Use the pio pins on the
+Atmel for form an internal 8 bit bus linking the xilinux, several
+latching transceivers (74ACT11652 or 74AC16652?)
+
+cpu <---- bus ------> CF/IDE
+ ^       ^       ^
+ |       |       |
+ |      cpld  bidir-latch
+ |       |       |
+DS8641 DS3862 DS3862
+ |       |       |
+ v       v       v
+UNIBUS UNIBUS  UNIBUS
+ADDR / CONTROL DATA
+
+The idea is that the cpu, using FIQ interrupts services all the bus
+transactions.  The cpld acts as an address latch/address comparitor
+and interrupts the cpu when an address match occurs (basically BBSY +
+MSYN + proper address).
+
+The CPU then drives SSYN and completes the transaction.  When the CPU
+needs to become the bus master (for interrupts or data transfers) it
+asserts NPR / BRx / MSYN and runs the transaction "by hand".
+
+The worst case is probably when a device is polling a status register.
+In this case the cpu would be constantly interrupted, but should be
+able to get enough cycles done to complete an IDE transaction (disk
+read, for example).
+
+Almost all of the ARM code should be possible in C, with the exception
+of the FIQ code.  Certainly all the "personality" should be
+abstractable and only the low level nuts and bolts would be common.
+
+A simple bootloader should allow the cpu flash to be reprogrammed from
+an IDE/CF disk with a simple command, hopefully something you could
+enter via ODT.
+
+The CF would not be hot-swappable.  It might make sense to allow the
+cpu to control the CF power, so that if a CF was swapped and INIT
+asserted the CF power could be cycles to put the device back in "true
+IDE mode" (there by allowing a 'poor mans hot swap' without the extra
+buffers required for true hot swap)
+
+It should also be possible to simulate memory, namely ROM.
+
+Details
+-------
+
+Unibus adapter, quad width (slots C-F) for "SPC prime".
+4 layer .062" board; initially HASL, gold fingers in 'production'
+Mixed SMT & through-hole
+
+Address base programmable
+BR4/BR5 for interrupts, vector programmable
+NPG for dma transfers
+
+Use +5 for all parts except cpu, which has 5v tolerant i/o.  Will need
+a +3.3v LDO for the cpu.
+
+Several LED's for status
+CPLD JTAG
+CPU JTAG
+CPU serial header
+CF slot
+IDE header
+
+---------------------------------------------------------------------------
+
+CPLD
+
+if BBSY_L && MSYN_L & Axx compare - generate cpu interrupt
+
+BBSY_L	in
+MSYN_L	in
+A21_L	i/o
+A20_L	i/o
+A19_L	i/o
+A18_L	i/o
+A17_L	i/o
+A16_L	i/o
+A15_L	i/o
+A14_L	i/o
+A13_L	i/o
+A12_L	i/o
+A11_L	i/o
+A10_L	i/o
+A09_L	i/o
+A08_L	i/o
+A07_L	i/o
+A06_L	i/o
+A05_L	i/o
+A04_L	i/o
+A03_L	i/o
+A02_L	i/o
+A01_L	i/o
+A00_L	i/o
+
+D15_L	i/o
+D14_L	i/o
+D13_L	i/o
+D12_L	i/o
+D11_L	i/o
+D10_L	i/o
+D09_L	i/o
+D08_L	i/o
+D07_L	i/o
+D06_L	i/o
+D05_L	i/o
+D04_L	i/o
+D03_L	i/o
+D02_L	i/o
+D01_L	i/o
+D00_L	i/o
+
+INIT_L		in
+BG4_IN		in
+BG5_IN		in
+NPG_IN		in
+BG4_OUT		out
+BG5_OUT		out
+NPG_OUT		out
+
+INTR_L		out
+BR4_L		out
+BR5_L		out
+NPR_L		out
+
+CPU_INT	output
+CPU_RD	in
+CPU_WR	in
+
+cpu needs to read/write cpld registers
+    bus signal status
+    interrupt status
+    match address w/mask
+    read matched address
+    bg pass thru enable
+
+CPLD registers
+--------------
+
+WRITE
+
+0000 assert low
+    bit 7 n/a
+    bit 6 NPG_OUT  (only if assoc pass_thru bit == 0)
+    bit 5 BG4_OUT  (only if assoc pass_thru bit == 0)
+    bit 4 BG4_OUT  (only if assoc pass_thru bit == 0)
+
+    bit 3 NPR_L
+    bit 2 BR5_L
+    bit 1 BR4_L
+    bit 0 INTR_L
+
+0001 assert high
+
+0010 reset interrupt
+
+0011 pass-thru
+    bit 3 NPG_OUT
+    bit 2 BG5_OUT
+    bit 1 BG4_OUT
+    bit 0
+
+0101 address out high
+0110 address out med
+0111 address out low
+
+1000 match1 17-10
+1001 match1 9-2
+1010 match1 mask 9-2
+
+1011 match2 17-10
+1100 match2 9-2
+1101 match2 mask 9-2
+
+
+READ
+
+0000 - readback assert low
+    bit 7 n/a
+    bit 6 NPG_OUT
+    bit 5 NPR_L
+    bit 4 BG5_OUT
+    bit 3 BR5_L
+    bit 2 BR4_OUT
+    bit 1 BR4_L
+    bit 0 iNTR_L
+
+0001 - readback assert high
+
+0010 - cpu interrupt status
+    bit 0
+
+0011 - bus in
+    bit 4 SACK_IN
+    bit 3 BR4_IN
+    bit 2 BR5_IN
+    bit 1 NPG_IN
+    bit 0 INIT_IN
+
+0100 - address match status
+    bit 1 match2
+    bit 0 match1
+
+1000 - bus address matched high
+1001 - bus address matched med
+1010 - bus address matched low
+
+1111 - test readback
+    0xa5
+
+-----
+
+CPU
+
+16 bit bus to cpld i/o(16)  gpio  PA0-PA15
+
+usb pullup o gpio PA16
+cpld a0         o	gpio PA17
+cpld a1         o	gpio PA18
+cpld a2         o	gpio PA19
+cpld a3         o	gpio PA20
+PA21 - rxd1
+PA22 - txd1
+cpld rd		o	gpio PA23
+cpld wr		o	gpio PA24
+cpld int	i	gpio PA25
+
+PA26 - unused
+
+SSYN_L		i	gpio PA27 (assert via cpld)
+MSYN_L		i	gpio PA28 (assert via cpld)
+BBSY_L		i	gpio PA29 (assert via cpld)
+
+PA30 - unused
+PA31 - cpld clk pck2
+
+INTR_L		out	assert via cpld
+BR4_L		out	assert via cpld
+BG4_OUT		out	assert via cpld
+BR5_L		out	assert via cpld
+BG5_OUT		out	assert via cpld
+NPR_L		out	assert via cpld
+NPG_OUT		out	assert via cpld
+
+C0_L		in	read via cpld
+C1_L		in	read via cpld
+SACK_L		in	read via cpld (assert via cpld)
+INIT_L		in	read via cpld
+BG4_IN		in	read via cpld
+BG5_IN		in	read via cpld
+NPG_IN		in	read via cpld
+
+------
+
+READ/WRITE
+
+idle	SSYN in
+	MSYN in
+	BBSY in
+	data in
+	addr in
+
+ack	SSYN out
+
+INTERRUPT
+
+start	BGx out
+ack	SACK out
+
+wait	BBSY in
+	SSYN in
+
+master	BBSY out
+	INTR out
+	data out
+
+NPR
+	NPR out
+	SACK out
+	BBSY in
+
+	BBSY out
+
+--------
+Psuedo code
+
+READ/WRITE:
+clear cpld int ena
+set address & mask
+set cpld int ena
+wait for BBSY/MSYN/addr-match interrupt
+
+at interrupt
+sample C0,C1
+  (c1==0->read,c1==1->write;c0==0->16bit,c0==1->8bit,
+   A00==1 use D<15:08>,A00==0 use D<07:00>)
+sample data bus
+assert SSYN
+if read
+  assert data
+  wait for MSYN to deassert
+deassert SSYN
+if read
+  deassert data
+
+
+INTERRUPT:
+disable BRx pass-thru w/cpld
+assert BRx
+wait for BGx
+assert SACK
+wait for BBSY to deassert
+assert BBSY
+assert data (w/vector)
+assert INTR
+wait for SSYN
+
+enable BRx pass-thru w/cpld
+deassert data
+deassert INTR
+deassert BBSY
+
+
+NPR:
+disable NPG pass-thru w/cpld
+assert NPR
+wait for NPG
+assert SACK
+wait for BBSY to deassert
+assert BBSY
+
+assert addr
+assert C0,C1
+if write
+  assert data
+wait 150ns
+assert MSYN
+
+if write
+  wait for SSYN to assert
+  deassert MSYN
+  deassert data
+
+if read
+  wait for SSYN to assert
+  sample data
+  deassert MSYN
+
+wait 75ns
+deassert addr
+
+enable NPG pass-thru w/cpld
+deassert BBSY
+
+----------
+signal grouping
+
+READ/WRITE:
+signal dir
+BBSY	i
+MSYN	i
+SSYN	i
+C0	i
+C1	i
+
+SSYN	o	assert
+
+INTERRUPT:
+signal dir
+BBSY	i
+MSYN	i
+SSYN	i
+C0	i
+C1	i
+SACK	i
+
+BRx	o
+BGx	i
+
+SACK	o
+
+BBSY	o
+INTR	o
+
+NPR:
+signal dir
+BBSY	i
+MSYN	i
+SSYN	i
+C0	i
+C1	i
+SACK	i
+
+NPR	o
+SACK	o
+BBSY	o
+
+MSYN	o
+
+-----------
+
+E&F slots - ignore?
+
+ES2 SELECT 0 H		need
+ET2 SELECT 2 H		need
+ER2 SELECT 4 H
+ES1 SELECT 8 H
+EM2 OUT HIGH H		
+EN1 OUT LOW H		need
+EM1 IN H		need
+x EF2 BUS C1 L
+x EJ2 BUS C0 L
+x EJ1 BUS SSYN L
+- EB1 SSYN INHIBIT
+
+x EE1 BUS MSYN L
+
+x FT2 BUS SACK L
+x FC1 BUS SSYN L
+
+FL2 INTR DONE A H
+FW2 INTR DONE B H
+FN1 MASTER A L
+FS2 MASTER B L
+FU2 BUS REQUEST L
+
+FU1 RDR DONE H
+FV1 RDR INT ENB B
+FB1 BG IN H
+
+FK2 PUN READY H		need
+FH2 PUN INT ENB H	pulled up?
+FA1 BG OUT H
+
+------
+
+Signal paths
+
+bus		interface	on-board
+---		---------	--------
+
+8641 disables tied low
+
+MSYN_L		8641		gpio PA27/B_MSYN_IN, B_MSYN_OUT
+SSYN_L		8641		gpio PA28/B_SSYN_IN, B_SSYN_OUT
+BBSY_L		8641		gpio PA29/B_BBSY_IN, B_BBSY_OUT
+SACK_L		8641		B_SACK_IN, B_SACK_OUT
+
+8641 disables tied low
+
+C0_L		8641		gpio PA30/B_C0_IN, B_C0_OUT
+C1_L		8641		gpio PA31/B_C1_IN, B_C1_OUT
+
+3862
+
+INIT_L		8641		B_INIT_IN
+BG4_IN		8641		B_BG4_IN
+BG5_IN		8641		B_BG5_IN
+NPG_IN		8641		B_NPG_IN
+
+3862
+
+INTR_L		8641 		B_INTR_OUT
+BR4_L		8641		B_BR4_OUT
+BR5_L		8641		B_BR5_OUT
+NPR_L		8641		B_NPR_OUT
+BG4_OUT		8641		B_BG4_OUT
+BG5_OUT		8641		B_BG5_OUT
+NPG_OUT		8641		B_NPG_OUT
+
+Axx_L		3862		BUS_ADDR
+		dir signal	    cpld, BUS_ADDR_DIR (1=assert on bus)
+
+Dxx_L		3862		BUS_DATA
+		latch/data-3862 dir gpio PA25, BUS_DATA_DIR
+
+need 5v 16 bit bidir latch
+
+------
+
+TO DO:
+
+x  ADD TO CPLD: B_C0_IN, B_C1_IN, B_SSYN_IN, B_BBSY_IN, B_SACK_IN
+
+x  make c0,c1 part of match read and we can loose b_c0_in and b_c1_in as gpio's
+
+x  IDE CD0, CS1
+	- make it so you put the cpld in "ide mode" - it will assert ide cs
+	and ignore accesses with A3 = 0
+	- make register to reset ide mode something with A3=1
+	all ide accesses are a3=0
+
+x  Add yellow LED to cpld 
+
+x  ADD PA, PB as data lines for pdp-10
+
+x  Run clock from cpu to cpld in case we want a clock
+   use pa31 - clk pck2
+
+   run INIT from cpld to gpio so we can interrupt on reset
+
+   double check CF socket pins with CF spec
+   (i.e. model pin connections)
+
+   set up AD4 to read +5 voltage level via ADC, 
+   run DCOK to one of the gpio's
+
+--------------------
+
+IDE/ATA
+
+drive a0-a2	- same as cpld
+cs1, cs3	- from cpld
+iord		- same as cpld
+iowr		- same as cpld
+
+		RESET-	1  2  gnd	gnd
+		d7	3  4  d8
+		d6	5  6  d9
+		d5	7  8  d10
+		d4	9  10 d11
+		d3	11 12 d12
+		d2	13 14 d13
+		d1	15 16 d14
+		d0	17 18 d15
+		gnd	19 20 (keypin)
+		DMARQ	21 22 gnd
+		IOWR-	23 24 gnd
+		IORD-	25 26 gnd
+		IORDY	27 8  CSEL
+		DMACK-	29 30 gnd
+		INTRQ	31 32 IOCS16- (obsolete)
+		A1	33 34 PDIAG-
+		A0	35 36 A2
+		CS1-	37 38 CS3-
+		DASP-	39 40 gnd
+
+		+5	41 42 +5
+		gnd	43 44 reserved
+
+IDE is 40 pin .1" connector (2x20)
+
+2.5" is 44 pin 2mm connector (2x22)
+
+-------
+
+CF
+
+drive a0-a2
+cs0, cs1
+iord
+iowr
+
+		RESET-	1  2  D3
+		D4	3  4  D5
+		D6	5  6  D7
+		CS0#	7  8  A10
+		ATASEL#	9  10 A9
+		A8	11 12 A7
+			13 14 A6
+		A5	15 16 A4
+		A3	17 18 A2
+		A1	19 20 A0
+		D0	21 22 D1
+		D2	23 24 IOIS16#
+		CD2#	25 26 CD1#
+		D11	27 28 D12
+		D13	29 30 D14
+		D15	31 32 CS1#
+		VS1#	33 34 IORD#
+		IOWR#	35 36 WE#
+		INTRQ	37 38 
+		CSEL#	39 40 VS2#
+		RESET#	41 42 IORDY
+		INPACK#	43 44 REG#
+		DASP#	45 46 PDIAG#
+		D8	47 48 D9
+		D10	49 50 
+---
+CS0#	7 card select 0 Connect to chip select 0
+CS1#	32 card select 1 Connect to chip select 1
+IORD#	34 I/O read strobe Connect to GPL1
+IOWR#	35 I/O write strobe Connect to GPL2
+
+A0-A10	20,19,18,17,16,15,14,12,11,10,8
+	Address bit 0-10 Connect A0-A2, ground A3-A10
+
+D0-D15	21,22,23,2,3,4,5,6,47,48,49,27,28,29,30,31
+	data bits 0-15 Connect to data bus bits 0-15
+	Note: Bit 0 is the LSB and bit 15 is the MSB for the CompactFlash.
+
+INTRQ	37 Interrupt request to host Optional interrupt request to host
+
+OE#
+ATA SEL# 9
+	Enables True IDE Mode Connect to ground
+
+IOIS16#	24
+	16 bit transfer Not connected (host assumes 16 bit transfer)
+
+CD1#, CD2# 26, 25
+	card detect Not connected (hot insertion not supported)
+
+VS1#, VS2# 33, 40
+	Voltage sense Not connected
+
+WE#	36 write enable Not used in True IDE mode (connect to Vcc)
+
+CSEL#	39 cable select (master/slave) Connect to ground (enable card as master)
+RESET#	41 resets CF Connect to system power on reset
+
+IORDY	42 I/O ready Not connected
+
+INPACK#	43 input acknowledge Not connected
+
+REG#	44 Attribute memory enable Not used in True IDE mode (connect to Vcc)
+
+DASP#	45 drive active/slave present Not connected (no slave drive)
+
+PDIAG#	46 Passed diagnostic Not connected (no slave drive)
+
+
+------
+
+SAMBA "boot recovery"
+
+- tie TST, PA0, PA1, PA2 all high at reset
+- PIOA16 dedicated to usb pullup

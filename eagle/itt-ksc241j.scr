@@ -1,0 +1,104 @@
+# 
+Set Wire_Bend 2;
+# Grid changed to 'mm' to avoid loss of precision!
+Grid mm;
+Layer   1 Top;
+Layer   2 Route2;
+Layer  15 Route15;
+Layer  16 Bottom;
+Layer  17 Pads;
+Layer  18 Vias;
+Layer  19 Unrouted;
+Layer  20 Dimension;
+Layer  21 tPlace;
+Layer  22 bPlace;
+Layer  23 tOrigins;
+Layer  24 bOrigins;
+Layer  25 tNames;
+Layer  26 bNames;
+Layer  27 tValues;
+Layer  28 bValues;
+Layer  29 tStop;
+Layer  30 bStop;
+Layer  31 tCream;
+Layer  32 bCream;
+Layer  33 tFinish;
+Layer  34 bFinish;
+Layer  35 tGlue;
+Layer  36 bGlue;
+Layer  37 tTest;
+Layer  38 bTest;
+Layer  39 tKeepout;
+Layer  40 bKeepout;
+Layer  41 tRestrict;
+Layer  42 bRestrict;
+Layer  43 vRestrict;
+Layer  44 Drills;
+Layer  45 Holes;
+Layer  46 Milling;
+Layer  47 Measures;
+Layer  48 Document;
+Layer  49 Reference;
+Layer  51 tDocu;
+Layer  52 bDocu;
+Layer  91 Nets;
+Layer  92 Busses;
+Layer  93 Pins;
+Layer  94 Symbols;
+Layer  95 Names;
+Layer  96 Values;
+Description '\
+<b>ITT Cannon Push button switch</b><p>\n\
+<author>Created by brad@heeltoe.com</author>';
+
+Edit NORMOPEN.sym;
+Pin '0@A' Pas None Short R0 Off 1 (-5.08 0);
+Pin '0@B' Pas None Short R0 Off 1 (-5.08 -2.54);
+Pin '1@B' Pas None Short R180 Off 2 (7.62 -2.54);
+Pin '1@A' Pas None Short R180 Off 2 (7.62 0);
+Layer 94;
+Wire  0.1524 (-2.54 0) (-2.54 -2.54);
+Wire  0.1524 (5.08 0) (5.08 -2.54);
+Wire  0.2032 (-2.54 -2.54) (-1.27 -2.54) (3.048 -0.762);
+Wire  0.2032 (3.048 -2.032) (3.048 -2.54) (5.08 -2.54);
+Wire  0.2032 (0.762 -1.524) (0.762 -1.016);
+Wire  0.2032 (0.762 -0.508) (0.762 0.254) (0.762 0.508);
+Wire  0.2032 (0.762 1.016) (0.762 1.524);
+Wire  0.2032 (1.27 1.524) (0.762 1.524) (0.254 1.524);
+Wire  0.1524 (0.254 -0.254) (0.762 0.254) (1.27 -0.254);
+Layer 94;
+Circle 0 (-2.54 -2.54) (-2.032 -2.54);
+Layer 94;
+Circle 0 (5.08 -2.54) (5.588 -2.54);
+Layer 95;
+Change Size 1.778;
+Change Ratio 8;
+Text '>NAME' R0 (-3.048 2.286);
+Layer 96;
+Change Size 1.778;
+Change Ratio 8;
+Text '>VALUE' R0 (-3.81 -5.588);
+
+Edit KSC241J.pac;
+Description '';
+Layer 1;
+Smd 'P2' 2.8 1.0 -0 (2.9 2);
+Layer 1;
+Smd 'P4' 2.8 1.0 -0 (2.9 -2);
+Layer 1;
+Smd 'P1' 2.8 1.0 -0 (-2.9 2);
+Layer 1;
+Smd 'P3' 2.8 1.0 -0 (-2.9 -2);
+
+Edit KSC241J.dev;
+Prefix 'S';
+Description '\
+<b>PUSH SWITCH</b><p>\n\
+ITT-Cannon';
+Value On;
+Add NORMOPEN 'G$1' Next 0 (0 0);
+Package 'KSC241J' '''''';
+Technology  '';
+Connect  'G$1.0@A' 'P1'  'G$1.1@A' 'P3'  'G$1.1@B' 'P4'  'G$1.0@B' 'P2';
+
+Grid inch;

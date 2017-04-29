@@ -1,0 +1,380 @@
+;
+; udisk RL02 interrupt test
+; brad@heeltoe.com 1/2011
+;
+	.TITLE inttest
+	.ASECT
+
+RLCS= 174400		;RL02
+RLBA= 174402
+RLDA= 174404
+RLMP= 174406
+
+TKS= 177560		;TTY KBD STATUS
+TKB= 177562		;TTY KBD BUFFER
+TPS= 177564		;TTY PRINTER STATUS REG. ADDRESS
+TPB= 177566		;TTY PRINTER BUFFER REG. ADDRESS
+
+PS= 177776
+
+;
+; boot sector - read in reset of code (bootstrap reads 0-777)
+;
+	.=0
+boot:
+	mov #RLCS,r0
+	mov #1000,2(r0)		; ba = 1000
+	mov #2,4(r0)		; da = 1
+	mov #-4096.,6(r0)	; set wc
+	mov #14,(r0)		; read
+
+	tstb (r0)		; wait
+	bpl .-2
+
+	bit #100000,(r0)
+	beq ok
+	halt
+ok:
+	jmp @#start
+
+; tty interrupt vectors
+br4 = 200
+br5 = 240
+
+	.=60
+	ttin
+	br4
+
+	ttou
+	br4
+
+	.=160
+	rlint
+	br5
+
+; -------------------------------------------------------------
+
+;
+; code read from disk...
+;	
+	.=400
+	br	start
+
+IENABLE = 0100
+DSRDY   = 02
+RDRENB  = 01
+
+; init tty
+ttinit:
+	mov	#IENABLE+DSRDY+RDRENB,@#TKS
+	mov	#IENABLE,@#TPS
+	rts	pc
+
+;
+; tty input isr
+;
+ttin:
+	mov	r1,-(sp)
+
+	movb	@#TKB,r1
+	bis	#RDRENB,@#TKS
+
+	mov	(sp)+,r1
+	rtt
+
+;
+; tty output isr
+;
+ttou:
+	mov	r0,-(sp)
+	mov	r1,-(sp)
+	mov	r2,-(sp)
+
+	tstb	@#TPS		;ready?
+;	bpl	ttodone
+	beq	ttodone
+
+	mov	ttocnt,r1	;more to do?
+	beq	ttodone
+
+	mov	ttopnt,r1	
+	movb	(r1)+,r2
+	movb	r2,@#TPB
+
+	mov	r1,ttopnt
+	dec	ttocnt
+	br	ttoexit
+ttodone:
+	clr	@#ttobsy
+ttoexit:
+	mov	(sp)+,r2
+	mov	(sp)+,r1
+	mov	(sp)+,r0
+	rtt
+
+ttobsy:	0
+ttocnt:	0
+ttopnt:	0
+ttobuf:	.byte	200
+
+	.even
+;
+; service rl02 interrupt
+;
+rlint:
+	mov	r0,-(sp)
+	mov	r1,-(sp)
+	mov	r2,-(sp)
+
+	mov	#RLCS,r0
+	mov	#0,0(r0)
+
+	mov	(sp)+,r2
+	mov	(sp)+,r1
+	mov	(sp)+,r0
+	rtt
+
+;
+; START
+;
+	.even
+start:
+	mov	#10000,sp
+	jsr	pc,@#ttinit
+
+        bic     #340,PS
+
+	jsr	pc,@#type	; banner
+	.word	shdr
+
+	mov	#3,r5
+loop:
+	jsr	pc,@#type	; separator line
+	.word	sline
+	dec	r5
+	bne	loop
+
+done:
+	jsr	pc,@#type
+	.word	sdone
+	jsr	pc,@#crlf
+	jmp start
+;	halt
+
+crlf:
+	jsr	pc,@#type
+	.word	scrlf
+	rts	pc
+
+; -------------------------------------------------------------
+
+shdr:
+	.ascii	<15><12>
+	.ascii	/test start! test start! test start! test start! test start!/
+	.ascii	<15><12><0>
+
+sdone:
+	.ascii	/done./	
+	.ascii	<15><12><0>
+
+scrlf:
+	.ascii	<15><12><0>
+
+sline:	.ascii  /-----------------------------------------------------------------------/
+	.ascii	<15><12><0>
+
+	.even
+; -------------------------------------------------------------
+
+;
+;copy text to buffer
+;set buffer count
+;wait for buffer count == 0
+;
+
+type:
+	mov	r0,-(sp)	; save r0
+	mov	@2(sp),r0	; addr of text
+	mov	r1,-(sp)	; save r1
+	mov	r2,-(sp)	; save r2
+
+	mov 	@#ttobuf,r1
+	clr	r2
+1$:	movb	(r0)+,(r1)+	; push char
+	beq	2$		; done?
+	inc	r2
+	br	1$
+2$:
+	dec	r2
+	mov	r2,@#ttocnt	; save count-1
+	mov	@#ttobuf,r2
+	movb	(r2)+,r1	; point to 2nd char
+	mov	r2,@#ttopnt
+
+	inc	@#ttobsy
+	movb	r1,@#TPB	; start output
+4$:
+	jsr	pc,chkrg	; start register access
+	mov	@#ttobsy,r2
+	bne	4$		; wait till done
+
+	mov	(sp)+,r2	; restore r2
+	mov	(sp)+,r1	; restore r1
+	mov	(sp)+,r0	; restore r0
+	add	#2,(sp)		; skip address after jsr
+	rts	pc
+
+;
+typec:
+	tstb	@#TPS
+	bpl	typec	
+	movb	2(sp),@#TPB
+;
+1$:	tstb	@#TPS
+	bpl	1$
+;
+	rts	pc
+
+
+; -------------------------------------------------------------
+
+;
+; test rl02 register access
+;
+chkrg:
+	mov	r0,-(sp)	; save regs
+	mov	r1,-(sp)
+	mov	r2,-(sp)
+	mov	r3,-(sp)
+
+	jsr	pc,chkrw0	; check reg read/write
+	jsr	pc,chkrw1
+	jsr	pc,chkrw2
+	jsr	pc,chkrw3
+	jsr	pc,chkcs1	; check cs tstb reads in loop
+	jsr	pc,chkint1
+
+	mov	(sp)+,r3
+	mov	(sp)+,r2
+	mov	(sp)+,r1
+	mov	(sp)+,r0
+	rts pc
+
+;
+; read/write register
+;
+chkrw0:
+	mov #RLDA,r0
+	mov #0,r2
+	mov (r0), r1
+	mov r2,(r0)
+	mov (r0), r1
+	cmp r1,r2
+	beq 1$
+	halt
+1$:
+	mov #177777,r2
+	mov (r0), r1
+	mov r2,(r0)
+	mov (r0), r1
+	cmp r1,r2
+	beq 2$
+	halt
+2$:
+	mov #1234,r2
+	mov (r0), r1
+	mov r2,(r0)
+	mov (r0), r1
+	cmp r1,r2
+	beq 3$
+	halt
+3$:
+	rts pc
+
+;
+; inc register (r-m-w)
+;
+chkrw1:
+	mov #RLDA,r0
+	mov #1,r2
+	mov (r0), r1
+	mov r2,(r0)	;1
+	inc (r0)	;2
+	inc (r0)	;3
+	inc (r0)	;4
+	mov (r0),r3
+	cmp #4,r3
+	beq 1$
+	halt
+1$:
+	rts pc
+
+;
+; bis register (r-m-w)
+;
+chkrw2:
+	mov #RLDA,r0
+	mov (r0), r1
+	clr (r0)	;000
+	bis #10,(r0)	;010
+	bis #20,(r0)	;030
+	bis #01,(r0)	;031
+	mov (r0),r3
+	cmp #31,r3
+	beq 1$
+	halt
+1$:
+	rts pc
+
+;
+; bic register (r-m-w)
+;
+chkrw3:
+	mov #RLDA,r0
+	mov #0777,r2
+	mov (r0), r1
+	mov r2,(r0)	;777
+	bic #10,(r0)	;767
+	bic #20,(r0)	;747
+	bic #01,(r0)	;746
+	mov (r0),r3
+	cmp #746,r3
+	beq 1$
+	halt
+1$:
+	rts pc
+
+;
+; do command, wait for it, w/o interrupt
+;
+chkcs1:
+	mov #RLCS,r0
+	mov #6,r1		; seek
+;
+	mov #0,4(r0)		; da = 0
+	mov r1,(r0)
+	tstb (r0)
+	bpl .-2
+;
+	mov #0,4(r0)		; again
+	mov r1,(r0)
+	tstb (r0)
+	bpl .-2
+;
+	rts pc
+
+;
+; generate interrupt from rl02 controller
+;
+chkint1:
+	mov #RLCS,r0
+	mov #106,r1		; seek + ie
+;
+	mov #0,4(r0)		; da = 0
+	mov #0,(r0)
+;
+	mov r1,(r0)
+	tstb (r0)
+	bpl .-2
+;
+	rts pc

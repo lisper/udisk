@@ -1,0 +1,25 @@
+; simple csr read - make sure we read back 1230
+	.TITLE csr
+	.ASECT
+	.=0
+data:	.word	0
+
+RLCS= 174400
+RLBA= 174402
+RLDA= 174404
+RLMP= 174406
+	.=1000
+	mov #RLCS,r0
+loop:
+	mov (r0), r1
+	mov #01230, r2
+	cmp r1, r2
+	beq loop
+	halt
+	br loop
+
+	.=2000
+loop2:
+	nop
+	br	loop2
+

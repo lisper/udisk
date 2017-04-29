@@ -1,0 +1,58 @@
+Drill Station Info File: /home/brad/eagle/udisk/udisk.dri
+
+ Date              :  7/30/2006 13:05:54 
+ Drills            : /home/brad/eagle/udisk/udisk.drl
+ Device            : Excellon drill station
+
+Parameter settings:
+
+ Tolerance Drill + :  2.50 %
+ Tolerance Drill - :  2.50 %
+ Rotate            : no
+ Mirror            : no
+ Optimize          : yes
+ Auto fit          : yes
+ OffsetX           : 0inch
+ OffsetY           : 0inch
+ Layers            : Drills Holes
+
+Drill File Info:
+
+ Data Mode         : Absolute
+ Units             : 1/1000 Inch
+ End Of Block      : CR/LF
+
+Drill Tolerances:
+
+ -- Requested --  -- Used Drill --
+
+ Size       used  Code  Size
+
+ 1.700mm       2  T08   67.000mil
+ 2.200mm       2  T09   87.000mil
+ 1.300mm       2  T07   51.000mil
+ 0.950mm       4  T05   37.000mil
+ 2.300mm       2  T10   91.000mil
+
+Drills used:
+
+ Code  Size       used
+
+ T01   12.000mil   166
+ T02   20.000mil    44
+ T03   24.000mil   111
+ T04   32.000mil   190
+ T05   37.000mil     4
+ T06   40.000mil    41
+ T07   51.000mil     2
+ T08   67.000mil     2
+ T09   87.000mil     2
+ T10   91.000mil     2
+ T11   130.000mil     2
+ T12   150.000mil     2
+
+Total number of drills: 568
+
+Plotfiles:
+
+ /home/brad/eagle/udisk/udisk.drd

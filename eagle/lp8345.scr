@@ -1,0 +1,153 @@
+# Library script
+# 
+# Exported from /home/brad/udisk/lp8345.lbr at  2/18/2006 09:19:12 
+# 
+# EAGLE Version 4.11 Copyright (c) 1988-2003 CadSoft
+# 
+Set Wire_Bend 2;
+# Grid changed to 'mm' to avoid loss of precision!
+Grid mm;
+Layer   1 Top;
+Layer   2 Route2;
+Layer   3 Route3;
+Layer   4 Route4;
+Layer   5 Route5;
+Layer   6 Route6;
+Layer   7 Route7;
+Layer   8 Route8;
+Layer   9 Route9;
+Layer  10 Route10;
+Layer  11 Route11;
+Layer  12 Route12;
+Layer  13 Route13;
+Layer  14 Route14;
+Layer  15 Route15;
+Layer  16 Bottom;
+Layer  17 Pads;
+Layer  18 Vias;
+Layer  19 Unrouted;
+Layer  20 Dimension;
+Layer  21 tPlace;
+Layer  22 bPlace;
+Layer  23 tOrigins;
+Layer  24 bOrigins;
+Layer  25 tNames;
+Layer  26 bNames;
+Layer  27 tValues;
+Layer  28 bValues;
+Layer  29 tStop;
+Layer  30 bStop;
+Layer  31 tCream;
+Layer  32 bCream;
+Layer  33 tFinish;
+Layer  34 bFinish;
+Layer  35 tGlue;
+Layer  36 bGlue;
+Layer  37 tTest;
+Layer  38 bTest;
+Layer  39 tKeepout;
+Layer  40 bKeepout;
+Layer  41 tRestrict;
+Layer  42 bRestrict;
+Layer  43 vRestrict;
+Layer  44 Drills;
+Layer  45 Holes;
+Layer  46 Milling;
+Layer  47 Measures;
+Layer  48 Document;
+Layer  49 Reference;
+Layer  51 tDocu;
+Layer  52 bDocu;
+Layer  91 Nets;
+Layer  92 Busses;
+Layer  93 Pins;
+Layer  94 Symbols;
+Layer  95 Names;
+Layer  96 Values;
+Description '\
+<b>National LDO</b><p>\n\
+National LP8345 regulator\n\
+<author>Created by brad@heltoe.com</author>';
+
+Edit LP8345.sym;
+Pin 'OUT' Pas None Short R0 Off 0 (-7.62 0);
+Pin 'GND' In None Short R90 Off 0 (0 -7.62);
+Pin 'IN' In None Short R180 Off 0 (7.62 0);
+Layer 94;
+Change Style Continuous;
+Wire  0.4064 (-5.08 -5.08) (5.08 -5.08) (5.08 2.54) (-5.08 2.54) \
+      (-5.08 -5.08);
+Layer 95;
+Change Size 1.778;
+Change Ratio 8;
+Change Font Proportional;
+Text '>NAME' R0 (-2.54 7.62);
+Layer 96;
+Change Size 1.778;
+Change Ratio 8;
+Text '>VALUE' R0 (-2.54 5.08);
+Layer 95;
+Change Size 1.524;
+Change Ratio 8;
+Text 'GND' R0 (-2.032 -4.318);
+Layer 95;
+Change Size 1.524;
+Change Ratio 8;
+Text 'OUT' R0 (-4.445 -0.635);
+Layer 95;
+Change Size 1.524;
+Change Ratio 8;
+Text 'IN' R0 (2.667 -0.635);
+
+Edit TO252.pac;
+Description '\
+<b>SMALL OUTLINE TRANSISTOR</b><p>\n\
+TS-003';
+Layer 21;
+Wire  0.2032 (3.2766 3.8354) (3.277 -2.159) (-3.277 -2.159) (-3.2766 3.8354);
+Layer 51;
+Wire  0.2032 (-3.277 3.835) (3.2774 3.8346);
+Layer 25;
+Change Size 1.27;
+Change Ratio 8;
+Text '>NAME' R90 (-3.81 -2.54);
+Layer 27;
+Change Size 1.27;
+Change Ratio 8;
+Text '>VALUE' R90 (5.08 -2.54);
+Layer 39;
+Wire  0.0508 (-3.973 5.983) (3.973 5.983);
+Wire  0.0508 (3.973 -5.983) (-3.973 -5.983) (-3.973 5.983);
+Wire  0.0508 (3.973 5.983) (3.973 -5.983);
+Layer 1;
+Smd '3' 5.4 6.2 -0 R0 (0 2.5);
+Layer 1;
+Smd '1' 1 1.6 -0 R0 (-2.28 -4.8);
+Layer 1;
+Smd '2' 1 1.6 -0 R0 (2.28 -4.8);
+Layer 51;
+Rect R0 (-2.7178 -5.1562) (-1.8541 -2.2605);
+Layer 51;
+Rect R0 (1.8542 -5.1562) (2.7179 -2.2605);
+Layer 21;
+Rect R0 (-0.4318 -3.0226) (0.4319 -2.2605);
+Layer 51;
+Change Spacing 1.27;
+Change Pour Solid;
+Change Rank 0;
+Polygon 0.1998  (-2.5654 3.937) (-2.5654 4.6482) (-2.1082 5.1054) (2.1082 5.1054) \
+      (2.5654 4.6482) (2.5654 3.937) (-2.5654 3.937);
+Layer 51;
+Wire  0.2032 (-2.5654 3.937) \
+      (-2.5654 4.6482) (-2.1082 5.1054) (2.1082 5.1054) (2.5654 4.6482) \
+      (2.5654 3.937) (-2.5654 3.937);
+
+Edit LP8345.dev;
+Prefix 'IC';
+Description '<b>VOLTAGE REGULATOR</b>';
+Value On;
+Add LP8345 '1' Next 0 (0 0);
+Package 'TO252' '''''';
+Technology  '';
+Connect  '1.GND' '3'  '1.OUT' '1'  '1.IN' '2';
+Grid inch;
